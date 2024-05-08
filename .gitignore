@@ -12,7 +12,8 @@
 *.obj
 
 # Compilation
-# build/
+build/
+cryptopp/
 
 # Precompiled Headers
 *.gch
