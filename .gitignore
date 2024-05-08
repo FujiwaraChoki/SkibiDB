@@ -12,7 +12,7 @@
 *.obj
 
 # Compilation
-build/
+# build/
 
 # Precompiled Headers
 *.gch

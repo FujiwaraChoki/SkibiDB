@@ -210,41 +210,6 @@
 			"path" : "lib/cryptopp-cmake/.git/refs/heads/master"
 		},
 		{
-			"isCMake" : true,
-			"isExternal" : true,
-			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Modules/CMakeDetermineASMCompiler.cmake"
-		},
-		{
-			"isCMake" : true,
-			"isExternal" : true,
-			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Modules/CMakeDetermineCompiler.cmake"
-		},
-		{
-			"isCMake" : true,
-			"isExternal" : true,
-			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Modules/CMakeDetermineCompilerId.cmake"
-		},
-		{
-			"isCMake" : true,
-			"isExternal" : true,
-			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Modules/CMakeCompilerIdDetection.cmake"
-		},
-		{
-			"isCMake" : true,
-			"isExternal" : true,
-			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Modules/CMakeFindBinUtils.cmake"
-		},
-		{
-			"isCMake" : true,
-			"isExternal" : true,
-			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Modules/Compiler/GNU-FindBinUtils.cmake"
-		},
-		{
-			"isCMake" : true,
-			"isExternal" : true,
-			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Modules/CMakeASMCompiler.cmake.in"
-		},
-		{
 			"isGenerated" : true,
 			"path" : "build/CMakeFiles/3.28.0-msvc1/CMakeASMCompiler.cmake"
 		},
@@ -275,11 +240,6 @@
 		},
 		{
 			"path" : "lib/cryptopp-cmake/cmake/ResetInitialCompilerOptions.cmake"
-		},
-		{
-			"isCMake" : true,
-			"isExternal" : true,
-			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.28/Modules/CMakeTestASMCompiler.cmake"
 		},
 		{
 			"path" : "lib/cryptopp-cmake/cmake/FasterBuild.cmake"
@@ -444,46 +404,6 @@
 		},
 		{
 			"path" : "lib/cryptopp-cmake/cryptopp/sources.cmake"
-		},
-		{
-			"isGenerated" : true,
-			"path" : "build/lib/cryptopp-cmake/cryptopp/TestPrograms/test_x86_sse2.cpp"
-		},
-		{
-			"isGenerated" : true,
-			"path" : "build/lib/cryptopp-cmake/cryptopp/TestPrograms/test_x86_sse3.cpp"
-		},
-		{
-			"isGenerated" : true,
-			"path" : "build/lib/cryptopp-cmake/cryptopp/TestPrograms/test_x86_ssse3.cpp"
-		},
-		{
-			"isGenerated" : true,
-			"path" : "build/lib/cryptopp-cmake/cryptopp/TestPrograms/test_x86_sse41.cpp"
-		},
-		{
-			"isGenerated" : true,
-			"path" : "build/lib/cryptopp-cmake/cryptopp/TestPrograms/test_x86_sse42.cpp"
-		},
-		{
-			"isGenerated" : true,
-			"path" : "build/lib/cryptopp-cmake/cryptopp/TestPrograms/test_x86_clmul.cpp"
-		},
-		{
-			"isGenerated" : true,
-			"path" : "build/lib/cryptopp-cmake/cryptopp/TestPrograms/test_x86_aes.cpp"
-		},
-		{
-			"isGenerated" : true,
-			"path" : "build/lib/cryptopp-cmake/cryptopp/TestPrograms/test_x86_avx.cpp"
-		},
-		{
-			"isGenerated" : true,
-			"path" : "build/lib/cryptopp-cmake/cryptopp/TestPrograms/test_x86_avx2.cpp"
-		},
-		{
-			"isGenerated" : true,
-			"path" : "build/lib/cryptopp-cmake/cryptopp/TestPrograms/test_x86_sha.cpp"
 		},
 		{
 			"isCMake" : true,
