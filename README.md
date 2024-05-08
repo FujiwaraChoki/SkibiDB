@@ -1,9 +1,11 @@
-# SkibiDB - A secure, lightweight, and fast Database Management System
+# SkibiDB
+
+A secure, lightweight, and fast Database Management System written in C++
 
 ## Libraries
 
 - [nlohmann/json](https://github.com/nlohmann/json)
-- [weidai11/cryptopp](https://github.com/weidai11/cryptopp/)
+- [abdes/cryptopp-cmake](https://github.com/abdes/cryptopp-cmake)
 
 ## Installation
 
