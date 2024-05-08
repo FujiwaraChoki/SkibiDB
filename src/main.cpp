@@ -1,11 +1,11 @@
 #include <stdint.h>
 
-#include "termcolor.hpp"
 #include <iostream>
 #include <fstream>
 #include <string>
 
-#include "console.hpp"
+#include "termcolor.hpp"
+#include "console/Console.cpp"
 
 std::string getRootDir()
 {
@@ -58,5 +58,6 @@ int main()
 	// Run the console
 	console.start();
 
-	return 0;
+	// Return status code
+	return EXIT_SUCCESS;
 }

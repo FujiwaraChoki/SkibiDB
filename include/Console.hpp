@@ -1,31 +1,47 @@
-#include "termcolor.hpp"
+#ifndef CONSOLE_HPP
+#define CONSOLE_HPP
+
+#include <iostream>
+#include <string>
+
+#include "Tokenizer.hpp"
 
 class Console
 {
 public:
-    /* Constructor */
+    // Constructor
     Console();
 
-    /* Destructor */
+    // Destructor
     ~Console();
 
-    /* Starts the console */
+    // Starts the console
     void start();
 
-    /* Stops the console */
+    // Stops the console
     void stop();
 
-    /* Take user input */
+    // Get the running state of the console
+    bool isRunning() const;
+
+    // Set the running state of the console
+    void setRunning(bool state);
+
+    // Get the current command
+    std::string getCurrentCommand() const;
+
+    // Set the current command
+    void setCurrentCommand(const std::string &command);
+
+    // Take user input
     template <typename T>
-    T input(std::string message)
-    {
-        T value;
-        std::cout << message;
-        std::cin >> value;
-        return value;
-    }
+    T input(const std::string &message);
+
+    Tokenizer tokenizer;
 
 private:
-    bool isRunning;
-    std::string currentPath;
+    bool running;
+    std::string currentCommand;
 };
+
+#endif // CONSOLE_HPP
