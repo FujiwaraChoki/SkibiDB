@@ -13,7 +13,6 @@
 
 # Compilation
 build/
-cryptopp/
 
 # Precompiled Headers
 *.gch
@@ -75,7 +74,7 @@ _deps
 .vs/
 
 ### VisualStudioCode ###
-.vscode/*
+.vscode/
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
