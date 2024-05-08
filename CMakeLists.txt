@@ -17,10 +17,11 @@ include_directories(include)
 
 # Add libs
 add_subdirectory(lib/json)
-add_subdirectory(lib/termcolor)
-add_subdirectory(lib/cryptopp-cmake)
+# add_subdirectory(lib/cryptopp-cmake)
 
 add_executable(SkibiDB src/main.cpp)
+
+# target_link_libraries(SkibiDB cryptopp-static)
 
 # Done
 message("SkibiDB built successfully!")
