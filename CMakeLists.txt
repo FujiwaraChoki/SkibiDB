@@ -15,8 +15,9 @@ project(SkibiDB)
 # Add include directories
 include_directories(include)
 
-# Add libraries (json and cryptopp-cmake)
+# Add libs
 add_subdirectory(lib/json)
+add_subdirectory(lib/termcolor)
 add_subdirectory(lib/cryptopp-cmake)
 
 add_executable(SkibiDB src/main.cpp)
