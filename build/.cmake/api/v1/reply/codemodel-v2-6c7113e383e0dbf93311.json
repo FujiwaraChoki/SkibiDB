@@ -1,0 +1,205 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-8a27792ecea96cdeebe9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "lib/json",
+					"jsonFile" : "directory-lib.json-Debug-0bb764089398073f6e23.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "lib/json"
+				},
+				{
+					"build" : "lib/cryptopp-cmake",
+					"childIndexes" : 
+					[
+						3,
+						6
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-lib.cryptopp-cmake-Debug-af80e40b0d7c215adad8.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 2,
+					"source" : "lib/cryptopp-cmake"
+				},
+				{
+					"build" : "lib/cryptopp-cmake/test",
+					"childIndexes" : 
+					[
+						4,
+						5
+					],
+					"jsonFile" : "directory-lib.cryptopp-cmake.test-Debug-4274244b037997e6d3b8.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 2,
+					"source" : "lib/cryptopp-cmake/test",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "lib/cryptopp-cmake/test/unit",
+					"jsonFile" : "directory-lib.cryptopp-cmake.test.unit-Debug-5fb84b204ac52dc53f21.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"parentIndex" : 3,
+					"projectIndex" : 2,
+					"source" : "lib/cryptopp-cmake/test/unit"
+				},
+				{
+					"build" : "lib/cryptopp-cmake/test/integration",
+					"jsonFile" : "directory-lib.cryptopp-cmake.test.integration-Debug-9feec113c28a377cb9bd.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"parentIndex" : 3,
+					"projectIndex" : 2,
+					"source" : "lib/cryptopp-cmake/test/integration"
+				},
+				{
+					"build" : "lib/cryptopp-cmake/cryptopp",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-lib.cryptopp-cmake.cryptopp-Debug-b9b10df8d24ce653d825.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 2,
+					"source" : "lib/cryptopp-cmake/cryptopp",
+					"targetIndexes" : 
+					[
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "SkibiDB",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1
+					],
+					"name" : "nlohmann_json",
+					"parentIndex" : 0
+				},
+				{
+					"directoryIndexes" : 
+					[
+						2,
+						3,
+						4,
+						5,
+						6
+					],
+					"name" : "cryptopp-cmake",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "SkibiDB::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-SkibiDB-Debug-4c8c2921b4fbd0c16cf4.json",
+					"name" : "SkibiDB",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 6,
+					"id" : "cryptest::@d77ea84728f5bb98831f",
+					"jsonFile" : "target-cryptest-Debug-7092227ef6362e8ef7dd.json",
+					"name" : "cryptest",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 6,
+					"id" : "cryptopp::@d77ea84728f5bb98831f",
+					"jsonFile" : "target-cryptopp-Debug-40989eea1b7ecf687869.json",
+					"name" : "cryptopp",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "test-verbose::@b2584f53db67884c9833",
+					"jsonFile" : "target-test-verbose-Debug-ad5f07db60bb4c793f04.json",
+					"name" : "test-verbose",
+					"projectIndex" : 2
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "D:/Projects/Personal/SkibiDB/build",
+		"source" : "D:/Projects/Personal/SkibiDB"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

@@ -1,4 +1,6 @@
 # CMakeLists.txt
+cmake_minimum_required(VERSION 3.20)
+
 set(CMAKE_CXX_STANDARD 17)
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 set(CPACK_GENERATOR "DEB")
@@ -10,18 +12,11 @@ set(CPACK_DEBIAN_PACKAGE_MAINTAINER "SkibiDB Team")
 
 project(SkibiDB)
 
-add_subdirectory(src)
+# Add libraries (json and cryptopp-cmake)
+add_subdirectory(lib/json)
+add_subdirectory(lib/cryptopp-cmake)
 
-add_executable(SkibiDB main.cpp)
-
-# Libraries are in the /lib folder
-link_directories(lib)
-
-# Link nlohmann_json
-target_link_libraries(SkibiDB nlohmann_json::nlohmann_json)
-
-# Link Crypto++
-target_link_libraries(SkibiDB cryptopp)
+add_executable(SkibiDB src/main.cpp)
 
 # Done
 message("SkibiDB built successfully!")

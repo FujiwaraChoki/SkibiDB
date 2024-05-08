@@ -8,7 +8,7 @@
 ## Installation
 
 ```bash
-$ git clone
+$ git clone https://github.com/FujiwaraChoki/SkibiDB.git --recursive
 $ cd SkibiDB
 $ mkdir build
 $ cd build
