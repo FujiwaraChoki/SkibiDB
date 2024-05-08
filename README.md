@@ -6,6 +6,7 @@ A secure, lightweight, and fast Database Management System written in C++
 
 - [nlohmann/json](https://github.com/nlohmann/json)
 - [abdes/cryptopp-cmake](https://github.com/abdes/cryptopp-cmake)
+- [ikalnytskyi/termcolor](https://github.com/ikalnytskyi/termcolor)
 
 ## Installation
 
