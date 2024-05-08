@@ -12,6 +12,9 @@ set(CPACK_DEBIAN_PACKAGE_MAINTAINER "SkibiDB Team")
 
 project(SkibiDB)
 
+# Add include directories
+include_directories(include)
+
 # Add libraries (json and cryptopp-cmake)
 add_subdirectory(lib/json)
 add_subdirectory(lib/cryptopp-cmake)
