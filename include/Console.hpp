@@ -2,9 +2,11 @@
 #define CONSOLE_HPP
 
 #include <iostream>
+#include <vector>
 #include <string>
 
 #include "Tokenizer.hpp"
+#include "FileManager.hpp"
 
 class Console
 {
@@ -38,6 +40,8 @@ public:
     T input(const std::string &message);
 
     Tokenizer tokenizer;
+    FileManager fileManager;
+    std::vector<std::string> syntax;
 
 private:
     bool running;

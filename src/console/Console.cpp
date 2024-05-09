@@ -1,9 +1,14 @@
-#include <string>
+#include <algorithm>
 #include <iostream>
+#include <vector>
+#include <string>
 
+#include "syntax.hpp"
 #include "Console.hpp"
 #include "termcolor.hpp"
+#include "utilities.hpp"
 #include "Tokenizer.cpp"
+#include "FileManager.hpp"
 
 // Constructor
 Console::Console()
@@ -11,7 +16,8 @@ Console::Console()
     // Set the console to running
     setRunning(true);
 
-    this->tokenizer = Tokenizer();
+    this->syntax = getSyntaxKeywords();
+    this->fileManager = FileManager();
 }
 
 // Destructor
@@ -35,9 +41,6 @@ void Console::start()
 
         std::cout << getCurrentCommand() << std::endl;
 
-        // Print the current command
-        this->tokenizer.tokenize(getCurrentCommand());
-
         // Check if the command is "exit"
         if (strncmp(getCurrentCommand().c_str(), "exit", 4) == 0)
         {
@@ -46,10 +49,29 @@ void Console::start()
         }
         else
         {
+            // Tokenize the command
+            this->tokenizer = Tokenizer(getCurrentCommand());
+
+            // Loop until there are no more tokens
             while (this->tokenizer.hasMoreTokens())
             {
+                // Get the next token
                 std::string token = this->tokenizer.nextToken();
-                std::cout << "Console::start: " << token << std::endl;
+
+                std::cout << toUpperCase(token) << std::endl;
+
+                int count = std::count(this->syntax.begin(), this->syntax.end(), toUpperCase(token));
+
+                if (count > 0)
+                {
+                    // Command starts with keyword
+                    std::cout << termcolor::green << "Keyword: " << token << termcolor::reset << std::endl;
+                }
+                else
+                {
+                    // Not a keyword
+                    std::cout << termcolor::red << "Not a keyword: " << token << termcolor::reset << std::endl;
+                }
             }
         }
     }

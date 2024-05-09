@@ -1,63 +1,73 @@
 #include "Table.hpp"
 
-class Table
+#include <nlohmann/json.hpp>
+#include <stdexcept>
+
+Table::Table(const std::string &name, const std::vector<Attribute> &attributes)
 {
-public:
-    Table(const std::string &name, const std::vector<Attribute> &attributes)
-    {
-        this->name = name;
-        this->attributes = attributes;
-    }
+    this->name = name;
+    this->attributes = attributes;
+}
 
-    std::string getTableName() const
-    {
-        return name;
-    }
+std::string Table::getTableName() const
+{
+    return name;
+}
 
-    std::vector<Attribute> getAttributes() const
-    {
-        return attributes;
-    }
+std::vector<Attribute> Table::getAttributes() const
+{
+    return attributes;
+}
 
-    void addAttribute(const Attribute &attribute)
-    {
-        attributes.push_back(attribute);
-    }
+void Table::addAttribute(const Attribute &attribute)
+{
+    attributes.push_back(attribute);
+}
 
-    void removeAttribute(const std::string &name)
+void Table::removeAttribute(const std::string &name)
+{
+    for (auto it = attributes.begin(); it != attributes.end(); ++it)
     {
-        for (auto it = attributes.begin(); it != attributes.end(); ++it)
+        if (it->getAttributeName() == name)
         {
-            if (it->getAttributeName() == name)
-            {
-                attributes.erase(it);
-                return;
-            }
+            attributes.erase(it);
+            return;
         }
     }
+}
 
-    Attribute getAttribute(const std::string &name) const
+Attribute Table::getAttribute(const std::string &name) const
+{
+    for (const auto &attribute : attributes)
     {
-        for (const auto &attribute : attributes)
+        if (attribute.getAttributeName() == name)
         {
-            if (attribute.getAttributeName() == name)
-            {
-                return attribute;
-            }
+            return attribute;
         }
-        throw std::runtime_error("Attribute not found");
     }
+    throw std::runtime_error("Attribute not found");
+}
 
-    Attribute getAttribute(int index) const
+Attribute Table::getAttribute(int index) const
+{
+    if (index < 0 || index >= attributes.size())
     {
-        if (index < 0 || index >= attributes.size())
-        {
-            throw std::runtime_error("Invalid index");
-        }
-        return attributes[index];
+        throw std::runtime_error("Invalid index");
     }
+    return attributes[index];
+}
 
-private:
-    std::string name;
-    std::vector<Attribute> attributes;
-};
+std::string Table::toString() const
+{
+    nlohmann::json j;
+    j["name"] = name;
+    j["attributes"] = nlohmann::json::array();
+    for (const auto &attribute : attributes)
+    {
+        nlohmann::json attr;
+        attr["name"] = attribute.getAttributeName();
+        attr["type"] = attribute.getAttributeType();
+        j["attributes"].push_back(attr);
+    }
+    return j.dump(4);
+}

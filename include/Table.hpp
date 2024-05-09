@@ -28,6 +28,8 @@ public:
     // Get the attribute with the given index
     Attribute getAttribute(int index) const;
 
+    std::string toString() const;
+
 private:
     std::string name;
     std::vector<Attribute> attributes;

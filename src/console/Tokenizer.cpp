@@ -1,7 +1,7 @@
 #include "Tokenizer.hpp"
 
 Tokenizer::Tokenizer()
-    : str(""), pos(0)
+    : pos(0)
 {
 }
 
@@ -42,16 +42,12 @@ bool Tokenizer::hasMoreTokens() const
     return pos < str.size();
 }
 
-std::vector<std::string> Tokenizer::tokenize(const std::string &str)
+std::vector<std::string> Tokenizer::tokenize()
 {
-    // Clear the tokens
-    tokens.clear();
+    std::vector<std::string> tokens;
 
-    // Set the string
-    this->str = str;
-
-    // Set the position
-    this->pos = 0;
+    // Reset the position
+    pos = 0;
 
     // Loop until there are no more tokens
     while (hasMoreTokens())
@@ -59,12 +55,19 @@ std::vector<std::string> Tokenizer::tokenize(const std::string &str)
         // Get the next token
         std::string token = nextToken();
 
-        std::cout << "Tokenizer::tokenize: " << token << std::endl;
-
         // Add the token to the list
         tokens.push_back(token);
     }
 
     // Return the tokens
     return tokens;
+}
+
+std::vector<std::string> Tokenizer::tokenize(const std::string &str)
+{
+    // Create a tokenizer with the given string
+    Tokenizer tokenizer(str);
+
+    // Tokenize the string
+    return tokenizer.tokenize();
 }

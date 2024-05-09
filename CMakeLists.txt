@@ -16,12 +16,25 @@ project(SkibiDB)
 include_directories(include)
 
 # Add libs
+#add_subdirectory(lib/cryptopp-cmake)
+
+add_executable(SkibiDB
+    src/main.cpp
+    src/utilities.cpp
+    src/skibidb/Loader.cpp
+    src/skibidb/SkibiDB.cpp
+    src/data_structs/Table.cpp
+    src/data_structs/Attribute.cpp
+    src/file_manager/FileManager.cpp
+)
+
+#target_link_libraries(SkibiDB cryptopp-static)
+
+# Add nlohmann/json, folder is named json
 add_subdirectory(lib/json)
-# add_subdirectory(lib/cryptopp-cmake)
 
-add_executable(SkibiDB src/main.cpp)
-
-# target_link_libraries(SkibiDB cryptopp-static)
+# Link nlohmann/json
+target_link_libraries(SkibiDB nlohmann_json::nlohmann_json)
 
 # Done
 message("SkibiDB built successfully!")
