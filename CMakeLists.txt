@@ -34,7 +34,7 @@ add_executable(SkibiDB
 add_subdirectory(lib/json)
 
 # Link nlohmann/json
-target_link_libraries(SkibiDB nlohmann_json::nlohmann_json)
+target_link_libraries(SkibiDB nlohmann_json::nlohmann_json -Wzero-as-null-pointer-constant)
 
 # Done
 message("SkibiDB built successfully!")

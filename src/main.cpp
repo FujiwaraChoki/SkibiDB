@@ -25,6 +25,8 @@ std::string getRootDir()
 		found = ROOT_PATH.find_last_of("/\\");
 	}
 
+	std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Root directory: " << ROOT_PATH << std::endl;
+
 	// Return the root path
 	return ROOT_PATH;
 }

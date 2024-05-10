@@ -6,19 +6,17 @@ in the form of Class Instances of Tables and Attributes.
 */
 #include "Loader.hpp"
 
-class Loader
+Loader::Loader()
 {
-public:
-    Loader()
-    {
-        std::cout << "Loader constructor" << std::endl;
-    }
-    ~Loader()
-    {
-        std::cout << "Loader destructor" << std::endl;
-    }
-    void load()
-    {
-        std::cout << "Loader load" << std::endl;
-    }
-};
+    std::cout << "Loader created" << std::endl;
+}
+
+Loader::~Loader()
+{
+    std::cout << "Loader destroyed" << std::endl;
+}
+
+void Loader::load()
+{
+    std::cout << "Loading database" << std::endl;
+}

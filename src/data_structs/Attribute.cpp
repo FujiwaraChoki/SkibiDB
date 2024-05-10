@@ -14,21 +14,22 @@ void Attribute::setAttributeName(const std::string &name)
     this->name = name;
 }
 
-template <typename T>
-T Attribute::getAttributeValue() const
+std::variant<int, double, std::string> Attribute::getAttributeValue() const
 {
-    if (std::holds_alternative<T>(value))
-    {
-        return std::get<T>(value);
-    }
-    else
-    {
-        throw std::runtime_error("Invalid attribute type");
-    }
+    return value;
 }
 
-template <typename T>
-void Attribute::setAttributeValue(const T &value)
+void Attribute::setAttributeValue(const std::variant<int, double, std::string> &value)
 {
     this->value = value;
+}
+
+std::string Attribute::getAttributeType() const
+{
+    return type;
+}
+
+void Attribute::setAttributeType(const std::string &type)
+{
+    this->type = type;
 }

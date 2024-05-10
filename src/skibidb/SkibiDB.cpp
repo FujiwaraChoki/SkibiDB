@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include "termcolor.hpp"
 #include "Attribute.hpp"
 #include "SkibiDB.hpp"
@@ -6,6 +8,7 @@
 #include <nlohmann/json.hpp>
 #include <algorithm>
 #include <iostream>
+#include <cstdint>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -22,7 +25,7 @@ SkibiDB::~SkibiDB()
 {
 }
 
-void SkibiDB::addTable(std::string name, std::string path)
+int16_t SkibiDB::addTable(std::string name, std::string path)
 {
     // Parse the JSON file
     json j = json::parse(path);
@@ -55,24 +58,25 @@ void SkibiDB::addTable(std::string name, std::string path)
         // Set the attribute value based on the type
         if (type == "int")
         {
-            attribute.setAttributeValue<std::int32_t>(std::stoi(valueStr));
+            attribute.setAttributeValue(std::stoi(valueStr));
         }
         else if (type == "double")
         {
-            attribute.setAttributeValue<double>(std::stod(valueStr));
+            attribute.setAttributeValue(std::stod(valueStr));
         }
         else if (type == "string")
         {
-            attribute.setAttributeValue<std::string>(valueStr);
+            attribute.setAttributeValue(valueStr);
         }
-        else if (type = == = "boolean")
+        else if (type == "boolean")
         {
-            attribute.setAttributeValue<bool>(valueStr == "true");
+            attribute.setAttributeValue(valueStr == "true" ? 0 : 1);
         }
         else
         {
             std::cout << termcolor::red << "[ERROR] " << termcolor::reset << "Invalid attribute type: " << type << std::endl;
-            continue;
+
+            return 1; // error out
         }
 
         // Add the attribute to the final list
@@ -86,9 +90,11 @@ void SkibiDB::addTable(std::string name, std::string path)
     this->tables.push_back(table);
 
     std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Added table: " << name << std::endl;
+
+    return 0;
 }
 
-void SkibiDB::removeTable(std::string name)
+int16_t SkibiDB::removeTable(std::string name)
 {
     // Find the table with the given name
     auto it = std::find_if(this->tables.begin(), this->tables.end(), [name](const Table &table)
@@ -99,10 +105,14 @@ void SkibiDB::removeTable(std::string name)
     {
         this->tables.erase(it);
         std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Removed table: " << name << std::endl;
+
+        return 0;
     }
     else
     {
         std::cout << termcolor::red << "[ERROR] " << termcolor::reset << "Table not found: " << name << std::endl;
+
+        return 1;
     }
 }
 
@@ -121,14 +131,4 @@ Table SkibiDB::getTable(std::string name) const
     {
         throw std::runtime_error("Table not found");
     }
-}
-
-std::vector<Table> SkibiDB::getTables() const
-{
-    return this->tables;
-}
-
-void SkibiDB::setTables(std::vector<Table> tables)
-{
-    this->tables = tables;
 }

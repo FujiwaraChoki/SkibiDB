@@ -112,9 +112,14 @@ void Console::setCurrentCommand(const std::string &command)
 template <typename T>
 T Console::input(const std::string &message)
 {
-    T value;
+    std::string inputString;
     std::cout << termcolor::green << message << termcolor::reset;
-    std::getline(std::cin, value);
+    std::getline(std::cin, inputString);
+
+    // Convert the input string to the desired type
+    std::istringstream iss(inputString);
+    T value;
+    iss >> value;
 
     return value;
 }

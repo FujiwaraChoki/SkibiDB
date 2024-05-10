@@ -20,8 +20,6 @@ public:
     ~FileManager();
     void load();
     void save();
-    void save_json(std::string filename, json j);
-    json load_json(std::string filename);
     std::vector<std::string> listFiles(std::string skibiPath);
 
     SkibiDB getSkibiDB() { return skibiDB; }

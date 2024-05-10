@@ -9,7 +9,10 @@
 
 FileManager::FileManager()
 {
-    std::string localPath = std::getenv("SKIBI_PATH");
+    const char *skibiPath = std::getenv("SKIBI_PATH");
+    std::string localPath = skibiPath ? skibiPath : "";
+
+    std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Loading Skibi database..." << std::endl;
 
     if (localPath.empty())
     {
@@ -34,6 +37,19 @@ FileManager::~FileManager()
 void FileManager::addFile(std::string file)
 {
     this->files.push_back(file);
+}
+
+std::vector<std::string> FileManager::listFiles(std::string path)
+{
+    std::vector<std::string> files;
+
+    for (const auto &entry : std::filesystem::directory_iterator(path))
+    {
+        std::string filename = entry.path().filename().string();
+        files.push_back(filename);
+    }
+
+    return files;
 }
 
 void FileManager::load()

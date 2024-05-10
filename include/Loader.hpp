@@ -1,18 +1,14 @@
+#ifndef LOADER_HPP
+#define LOADER_HPP
+
 #include <iostream>
 
 class Loader
 {
 public:
-    Loader()
-    {
-        std::cout << "Loader constructor" << std::endl;
-    }
-    ~Loader()
-    {
-        std::cout << "Loader destructor" << std::endl;
-    }
-    void load()
-    {
-        std::cout << "Loader load" << std::endl;
-    }
+    Loader();
+    ~Loader();
+    void load();
 };
+
+#endif /* LOADER_HPP */
