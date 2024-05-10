@@ -29,7 +29,7 @@ std::string buildSkibiPath()
     }
 
     // Set env
-    SetEnvironmentVariableA("SKIBI_PATH", skibiPath.c_str());
+    _putenv_s("SKIBI_PATH", skibiPath.c_str());
 
     return skibiPath;
 }
