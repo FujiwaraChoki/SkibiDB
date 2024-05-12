@@ -47,6 +47,16 @@ void Console::start()
         // Check if the command is "exit"
         if (strcmp(getCurrentCommand().c_str(), "exit") == 0)
         {
+            // Ask the user if they want to save the database
+            std::string save = input<std::string>("Save database? (y/n): ");
+
+            // If the user wants to save the database
+            if (strcmp(save.c_str(), "y") == 0)
+            {
+                // Save the database
+                this->fileManager->save();
+            }
+
             // Stop the console
             stop();
         }
