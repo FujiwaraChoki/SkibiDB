@@ -12,25 +12,30 @@ Tokenizer::Tokenizer(const std::string &str)
 
 std::string Tokenizer::nextToken()
 {
-    // Find the next space starting from current position
-    size_t nextSpace = str.find(' ', pos);
-
-    // Check if no space is found from the current position onwards
-    if (nextSpace == std::string::npos)
+    // Treat as one token if starts with (, and ends with )
+    if (str[pos] == '(')
     {
-        // Get the token from current position to the end of the string
-        std::string token = str.substr(pos);
-        // Update the position to the end of the string
-        pos = str.size();
-        // Return the token
+        size_t end = str.find_first_of(")", pos);
+        std::string token = str.substr(pos, end - pos + 1);
+        pos = end + 1;
         return token;
     }
 
+    // Finds the next token
+    size_t start = str.find_first_not_of(" \t\n\r\f\v", pos);
+    size_t end = str.find_first_of(" \t\n\r\f\v", start);
+
+    // If the end is not found, set it to the end of the string
+    if (end == std::string::npos)
+    {
+        end = str.size();
+    }
+
     // Get the token
-    std::string token = str.substr(pos, nextSpace - pos);
+    std::string token = str.substr(start, end - start);
 
     // Update the position
-    pos = nextSpace + 1;
+    pos = end;
 
     // Return the token
     return token;
@@ -38,7 +43,7 @@ std::string Tokenizer::nextToken()
 
 bool Tokenizer::hasMoreTokens() const
 {
-    // Check if the position is less than the string length
+    // Check if there are more tokens
     return pos < str.size();
 }
 
@@ -56,7 +61,7 @@ std::vector<std::string> Tokenizer::tokenize()
         std::string token = nextToken();
 
         // Add the token to the list
-        tokens.push_back(token);
+        tokens.push_back(toUpperCase(token));
     }
 
     // Return the tokens

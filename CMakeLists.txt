@@ -21,7 +21,6 @@ include_directories(include)
 add_executable(SkibiDB
     src/main.cpp
     src/utilities.cpp
-    src/skibidb/Loader.cpp
     src/skibidb/SkibiDB.cpp
     src/data_structs/Table.cpp
     src/data_structs/Attribute.cpp

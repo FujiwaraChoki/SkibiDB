@@ -1,6 +1,7 @@
 #include <stdint.h>
 
 #include "termcolor.hpp"
+#include "utilities.hpp"
 #include "Attribute.hpp"
 #include "SkibiDB.hpp"
 #include "Table.hpp"
@@ -13,6 +14,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <map>
 
 using json = nlohmann::json;
 
@@ -25,71 +27,89 @@ SkibiDB::~SkibiDB()
 {
 }
 
-int16_t SkibiDB::addTable(std::string name, std::string path)
+int16_t SkibiDB::addTable(std::string tableName, std::vector<std::map<std::string, std::string>> attributes)
 {
+    std::vector<Attribute> finalAttributes;
+
+    // Each attribute is a map (each has a name, value, and type)
+    for (const auto &attributeMap : attributes)
+    {
+        // Make a copy of the map to allow modification
+        std::map<std::string, std::string> mutableAttributeMap = attributeMap;
+
+        // Get the attribute name
+        std::string name = mutableAttributeMap["name"];
+
+        // Get the attribute type
+        std::string type = mutableAttributeMap["type"];
+
+        // Create a new attribute
+        Attribute newAttribute;
+        newAttribute.setAttributeName(name);
+        newAttribute.setAttributeType(type);
+
+        // Add the attribute to the final list
+        finalAttributes.push_back(newAttribute);
+    }
+
+    // Create a new table
+    Table table(tableName, finalAttributes);
+
+    // Add the table to the list of tables
+    this->tables.push_back(table);
+
+    std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Added table: " << tableName << std::endl;
+
+    return 0;
+}
+
+int16_t SkibiDB::addTable(std::string tableName, std::string path)
+{
+    std::string fullPath = buildSkibiPath() + "\\" + path;
+    // Read file contents
+    std::string contents;
+    std::ifstream file(fullPath);
+
+    // Use getline
+    std::string line;
+    while (std::getline(file, line))
+    {
+        contents += line;
+    }
+
     // Parse the JSON file
-    json j = json::parse(path);
+    json j = json::parse(contents);
 
     std::vector<Attribute> finalAttributes;
 
     // Find attributes in the JSON file
     json attributes = j["attributes"];
 
-    // Each attribute is a JSON object (each has a name, value and type)
-    for (json::iterator it = attributes.begin(); it != attributes.end(); ++it)
+    // Each attribute is a JSON object (each has a name and type)
+    for (const auto &attribute : attributes)
     {
         // Get the attribute name
-        std::string name = it.key();
+        std::string name = attribute["name"];
 
-        // Get the attribute value
-        json value = it.value();
+        std::cout << name << std::endl;
 
         // Get the attribute type
-        std::string type = value["type"];
-
-        // Get the attribute value
-        std::string valueStr = value["value"];
+        std::string type = attribute["type"];
 
         // Create a new attribute
-        Attribute attribute;
-        attribute.setAttributeName(name);
-        attribute.setAttributeType(type);
-
-        // Set the attribute value based on the type
-        if (type == "int")
-        {
-            attribute.setAttributeValue(std::stoi(valueStr));
-        }
-        else if (type == "double")
-        {
-            attribute.setAttributeValue(std::stod(valueStr));
-        }
-        else if (type == "string")
-        {
-            attribute.setAttributeValue(valueStr);
-        }
-        else if (type == "boolean")
-        {
-            attribute.setAttributeValue(valueStr == "true" ? 0 : 1);
-        }
-        else
-        {
-            std::cout << termcolor::red << "[ERROR] " << termcolor::reset << "Invalid attribute type: " << type << std::endl;
-
-            return 1; // error out
-        }
+        Attribute newAttribute;
+        newAttribute.setAttributeName(name);
+        newAttribute.setAttributeType(type);
 
         // Add the attribute to the final list
-        finalAttributes.push_back(attribute);
+        finalAttributes.push_back(newAttribute);
     }
 
     // Create a new table
-    Table table(name, finalAttributes);
+    Table table(tableName, finalAttributes);
 
     // Add the table to the list of tables
     this->tables.push_back(table);
-
-    std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Added table: " << name << std::endl;
 
     return 0;
 }
@@ -110,7 +130,7 @@ int16_t SkibiDB::removeTable(std::string name)
     }
     else
     {
-        std::cout << termcolor::red << "[ERROR] " << termcolor::reset << "Table not found: " << name << std::endl;
+        std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Table not found: " << name << std::endl;
 
         return 1;
     }

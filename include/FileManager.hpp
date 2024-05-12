@@ -10,6 +10,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <map>
 
 using json = nlohmann::json;
 
@@ -22,17 +23,15 @@ public:
     void save();
     std::vector<std::string> listFiles(std::string skibiPath);
 
-    SkibiDB getSkibiDB() { return skibiDB; }
-    void setSkibiDB(SkibiDB skibiDB) { this->skibiDB = skibiDB; }
-    std::string getSkibiPath();
+    SkibiDB *getSkibiDB() { return this->skibiDB; } // Return pointer instead of object
+    void setSkibiDB(SkibiDB *skibiDB) { this->skibiDB = skibiDB; }
 
     void addFile(std::string file);
 
 private:
     std::string skibiPath;
-    SkibiDB skibiDB;
-    std::vector<std::string>
-        files;
+    SkibiDB *skibiDB;
+    std::vector<std::string> files;
     std::vector<std::string> extensions;
 };
 

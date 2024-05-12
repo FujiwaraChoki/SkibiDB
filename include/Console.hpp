@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 
+#include "SkibiDB.hpp"
 #include "Tokenizer.hpp"
 #include "FileManager.hpp"
 
@@ -39,13 +40,15 @@ public:
     template <typename T>
     T input(const std::string &message);
 
-    Tokenizer tokenizer;
-    FileManager fileManager;
+    Tokenizer *tokenizer;
+    FileManager *fileManager;
     std::vector<std::string> syntax;
+    std::vector<std::string> keywords;
 
 private:
     bool running;
     std::string currentCommand;
+    SkibiDB *skibiDB;
 };
 
 #endif // CONSOLE_HPP

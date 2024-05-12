@@ -1,7 +1,9 @@
 #include <algorithm>
+#include <iterator>
 #include <iostream>
 #include <vector>
 #include <string>
+#include <map>
 
 #include "syntax.hpp"
 #include "Console.hpp"
@@ -10,14 +12,15 @@
 #include "Tokenizer.cpp"
 #include "FileManager.hpp"
 
-// Constructor
 Console::Console()
 {
     // Set the console to running
     setRunning(true);
 
-    this->syntax = getSyntaxKeywords();
-    this->fileManager = FileManager();
+    this->syntax = getSyntax();
+    this->fileManager = new FileManager();
+    // Assign the pointer directly
+    this->skibiDB = this->fileManager->getSkibiDB();
 }
 
 // Destructor
@@ -39,10 +42,8 @@ void Console::start()
         // Set the current command
         setCurrentCommand(command);
 
-        std::cout << getCurrentCommand() << std::endl;
-
         // Check if the command is "exit"
-        if (strncmp(getCurrentCommand().c_str(), "exit", 4) == 0)
+        if (strcmp(getCurrentCommand().c_str(), "exit") == 0)
         {
             // Stop the console
             stop();
@@ -50,28 +51,102 @@ void Console::start()
         else
         {
             // Tokenize the command
-            this->tokenizer = Tokenizer(getCurrentCommand());
+            std::string foundSyntax;
 
-            // Loop until there are no more tokens
-            while (this->tokenizer.hasMoreTokens())
+            // Loop through syntax template statements (SQL)
+            for (const auto &syntax : this->syntax)
             {
-                // Get the next token
-                std::string token = this->tokenizer.nextToken();
+                // TODO: Fix this, as it doens't work!!
 
-                std::cout << toUpperCase(token) << std::endl;
+                // See if cleaned syntax is in token
+                std::string cleaned = cleanSyntax(syntax);
 
-                int count = std::count(this->syntax.begin(), this->syntax.end(), toUpperCase(token));
+                // Set the found syntax
+                foundSyntax = syntax;
+            }
 
-                if (count > 0)
+            // Execute the syntax
+            if (!foundSyntax.empty())
+            {
+                // Tokenize the command
+                Tokenizer tokenizer(getCurrentCommand());
+
+                // Get the tokens
+                std::vector<std::string> tokens = tokenizer.tokenize();
+
+                for (int i = 0; i < tokens.size(); i++)
                 {
-                    // Command starts with keyword
-                    std::cout << termcolor::green << "Keyword: " << token << termcolor::reset << std::endl;
+                    std::string token = tokens[i];
+                    // Starts with CREATE
+                    if ((strcmp("CREATE", token.c_str()) == 0) && (strcmp("TABLE", tokens[i + 1].c_str()) == 0))
+                    {
+                        std::string tableName = tokens[i + 2];
+
+                        // Vector of map of attributes
+                        std::vector<std::map<std::string, std::string>> attributes;
+
+                        // Remove all parantheses
+                        std::string cleanCommand = getCurrentCommand();
+                        cleanCommand.erase(std::remove(cleanCommand.begin(), cleanCommand.end(), '('), cleanCommand.end());
+                        cleanCommand.erase(std::remove(cleanCommand.begin(), cleanCommand.end(), ')'), cleanCommand.end());
+
+                        // Attributes string is everything after tokens[i + 2]
+                        std::vector<std::string> tokensAfterTableName(tokens.begin() + i + 3, tokens.end());
+
+                        // Join the tokens
+                        std::string attrStr = join(tokensAfterTableName, " ");
+
+                        // Remove all ( and )
+                        attrStr.erase(std::remove(attrStr.begin(), attrStr.end(), '('), attrStr.end());
+                        attrStr.erase(std::remove(attrStr.begin(), attrStr.end(), ')'), attrStr.end());
+
+                        std::cout << attrStr << std::endl;
+
+                        // Tokenize the attributes
+                        Tokenizer attrTokenizer(attrStr);
+                        std::vector<std::string> attrTokens = attrTokenizer.tokenize();
+
+                        for (int j = 0; j < attrTokens.size(); j += 2)
+                        {
+                            if (j + 1 < attrTokens.size()) // Ensure there are enough tokens remaining
+                            {
+                                // Set the attribute name
+                                std::string name = attrTokens[j];
+
+                                // Set the attribute type
+                                std::string type = attrTokens[j + 1];
+
+                                // Add the attribute to the list
+                                std::map<std::string, std::string> attribute;
+                                attribute["name"] = toLowerCase(name);
+                                attribute["type"] = toLowerCase(type);
+
+                                // Add the attribute to the list of attributes
+                                attributes.push_back(attribute);
+                            }
+                        }
+
+                        // Create the table
+                        this->skibiDB->addTable(tableName, attributes);
+
+                        // Save the database
+                        this->fileManager->save();
+                    }
+                    else if ((strcmp("SHOW", token.c_str()) == 0) && (strcmp("TABLES", tokens[i + 1].c_str()) == 0))
+                    {
+                        // Show all tables
+                        std::vector<Table> tables = this->skibiDB->getTables();
+
+                        for (Table table : tables)
+                        {
+                            std::cout << termcolor::on_bright_grey << "=> " << termcolor::reset << table.getTableName() << std::endl;
+                        }
+                    }
                 }
-                else
-                {
-                    // Not a keyword
-                    std::cout << termcolor::red << "Not a keyword: " << token << termcolor::reset << std::endl;
-                }
+            }
+            else
+            {
+                std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Invalid statement." << std::endl;
             }
         }
     }
@@ -116,10 +191,5 @@ T Console::input(const std::string &message)
     std::cout << termcolor::green << message << termcolor::reset;
     std::getline(std::cin, inputString);
 
-    // Convert the input string to the desired type
-    std::istringstream iss(inputString);
-    T value;
-    iss >> value;
-
-    return value;
+    return inputString;
 }

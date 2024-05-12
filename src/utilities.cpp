@@ -7,8 +7,31 @@
 
 std::string toUpperCase(std::string str)
 {
-    std::string result = str;
+    std::string result = str.c_str();
     std::transform(result.begin(), result.end(), result.begin(), ::toupper);
+    return result;
+}
+
+std::string toLowerCase(std::string str)
+{
+    std::string result = str.c_str();
+    std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+    return result;
+}
+
+std::string join(const std::vector<std::string> &elements, const std::string &separator)
+{
+    if (elements.empty())
+    {
+        return "";
+    }
+
+    std::string result = elements[0];
+    for (size_t i = 1; i < elements.size(); ++i)
+    {
+        result += separator + elements[i];
+    }
+
     return result;
 }
 

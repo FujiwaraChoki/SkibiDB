@@ -17,7 +17,9 @@ FileManager::FileManager()
     if (localPath.empty())
     {
         std::cout << termcolor::yellow << "[WARN] " << termcolor::reset << "SKIBI_PATH environment variable not set. Setting default path." << std::endl;
+
         this->skibiPath = buildSkibiPath();
+        _putenv_s("SKIBI_PATH", this->skibiPath.c_str());
     }
     else
     {
@@ -55,7 +57,7 @@ std::vector<std::string> FileManager::listFiles(std::string path)
 void FileManager::load()
 {
     // Load the skibi database
-    this->skibiDB = SkibiDB();
+    this->skibiDB = new SkibiDB();
 
     // List all files in the .skibi directory
     this->files = listFiles(this->skibiPath);
@@ -72,6 +74,9 @@ void FileManager::load()
             // Add to files
             this->addFile(content);
 
+            // Add the table to the SkibiDB
+            this->skibiDB->addTable(file.substr(0, file.find(".skb")), file);
+
             std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Loaded file: " << file << std::endl;
         }
     }
@@ -80,14 +85,12 @@ void FileManager::load()
 void FileManager::save()
 {
     // Loop through SkibiDB tables
-    for (Table table : this->skibiDB.getTables())
+    for (Table table : this->skibiDB->getTables())
     {
         // Save each table to a file
         std::string filename = table.getTableName() + ".skb";
         std::ofstream out(this->skibiPath + "\\" + filename);
         out << table.toString();
         out.close();
-
-        std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Saved table: " << filename << std::endl;
     }
 }
