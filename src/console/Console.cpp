@@ -127,7 +127,7 @@ void Console::start()
                         // Create the table
                         this->skibiDB->addTable(tableName, attributes);
 
-                        std::cout << termcolor::grey << "[NOTE] " << termcolor::reset;
+                        std::cout << termcolor::magenta << "[NOTE] " << termcolor::reset;
                         std::cout << termcolor::italic << "It is recommended to save the database after creating a table." << termcolor::reset << std::endl;
                     }
                     else if ((strcmp("SHOW", token.c_str()) == 0) && (strcmp("TABLES", tokens[i + 1].c_str()) == 0))
@@ -207,6 +207,15 @@ void Console::start()
                         this->fileManager->save();
 
                         std::cout << termcolor::green << "[SUCCESS] " << termcolor::reset << "Database saved." << std::endl;
+                    }
+                    else if (strcmp("HELP", token.c_str()) == 0)
+                    {
+                        std::cout << termcolor::cyan << "[HELP] " << termcolor::reset << "Commands:" << std::endl;
+                        std::cout << termcolor::cyan << "[HELP] " << termcolor::reset << "CREATE TABLE <table_name> (<attribute_name> <attribute_type>, ...)" << std::endl;
+                        std::cout << termcolor::cyan << "[HELP] " << termcolor::reset << "SHOW TABLES" << std::endl;
+                        std::cout << termcolor::cyan << "[HELP] " << termcolor::reset << "INSERT INTO <table_name> (<attribute_name>, ...) VALUES (<value>, ...)" << std::endl;
+                        std::cout << termcolor::cyan << "[HELP] " << termcolor::reset << "SAVE" << std::endl;
+                        std::cout << termcolor::cyan << "[HELP] " << termcolor::reset << "EXIT" << std::endl;
                     }
                 }
             }

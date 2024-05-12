@@ -58,8 +58,6 @@ int16_t SkibiDB::addTable(std::string tableName, std::vector<std::map<std::strin
     // Add the table to the list of tables
     this->tables.push_back(table);
 
-    std::cout << termcolor::cyan << "[INFO] " << termcolor::reset << "Added table: " << tableName << std::endl;
-
     return 0;
 }
 
