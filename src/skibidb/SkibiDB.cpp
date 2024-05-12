@@ -58,7 +58,7 @@ int16_t SkibiDB::addTable(std::string tableName, std::vector<std::map<std::strin
     // Add the table to the list of tables
     this->tables.push_back(table);
 
-    std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Added table: " << tableName << std::endl;
+    std::cout << termcolor::cyan << "[INFO] " << termcolor::reset << "Added table: " << tableName << std::endl;
 
     return 0;
 }
@@ -124,7 +124,7 @@ int16_t SkibiDB::removeTable(std::string name)
     if (it != this->tables.end())
     {
         this->tables.erase(it);
-        std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Removed table: " << name << std::endl;
+        std::cout << termcolor::cyan << "[INFO] " << termcolor::reset << "Removed table: " << name << std::endl;
 
         return 0;
     }

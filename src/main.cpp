@@ -49,7 +49,7 @@ void printAscii()
 
 	std::cout << std::endl
 			  << std::endl;
-	std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Root directory: " << getRootDir() << std::endl;
+	std::cout << termcolor::cyan << "[INFO] " << termcolor::reset << "Root directory: " << getRootDir() << std::endl;
 }
 
 int main()

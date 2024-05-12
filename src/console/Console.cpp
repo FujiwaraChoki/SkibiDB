@@ -129,8 +129,7 @@ void Console::start()
                         // Create the table
                         this->skibiDB->addTable(tableName, attributes);
 
-                        // Save the database
-                        this->fileManager->save();
+                        std::cout << termcolor::grey << "[NOTE] " << termcolor::reset << termcolor::italic << "It is recommended to save the database after creating a table." << termcolor::reset << std::endl;
                     }
                     else if ((strcmp("SHOW", token.c_str()) == 0) && (strcmp("TABLES", tokens[i + 1].c_str()) == 0))
                     {
@@ -203,11 +202,12 @@ void Console::start()
 
                         // Add the row to the table
                         table.addRow(tokAttributes, values);
-
-                        // Save the database
+                    }
+                    else if (strcmp("SAVE", token.c_str()) == 0)
+                    {
                         this->fileManager->save();
 
-                        std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Inserted row into table " << tableName << std::endl;
+                        std::cout << termcolor::green << "[SUCCESS] " << termcolor::reset << "Database saved." << std::endl;
                     }
                 }
             }
@@ -255,7 +255,7 @@ template <typename T>
 T Console::input(const std::string &message)
 {
     std::string inputString;
-    std::cout << termcolor::green << message << termcolor::reset;
+    std::cout << termcolor::magenta << message << termcolor::reset;
     std::getline(std::cin, inputString);
 
     return inputString;

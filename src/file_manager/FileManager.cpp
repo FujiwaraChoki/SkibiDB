@@ -12,7 +12,7 @@ FileManager::FileManager()
     const char *skibiPath = std::getenv("SKIBI_PATH");
     std::string localPath = skibiPath ? skibiPath : "";
 
-    std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Loading Skibi database..." << std::endl;
+    std::cout << termcolor::cyan << "[INFO] " << termcolor::reset << "Loading Skibi database..." << std::endl;
 
     if (localPath.empty())
     {
@@ -77,7 +77,7 @@ void FileManager::load()
             // Add the table to the SkibiDB
             this->skibiDB->addTable(file.substr(0, file.find(".skb")), file);
 
-            std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Loaded file: " << file << std::endl;
+            std::cout << termcolor::cyan << "[INFO] " << termcolor::reset << "Loaded file: " << file << std::endl;
         }
     }
 }
