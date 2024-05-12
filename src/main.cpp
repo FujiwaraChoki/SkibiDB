@@ -48,6 +48,9 @@ void printAscii()
 
 	// Close the file
 	file.close();
+
+	std::cout << std::endl
+			  << std::endl;
 }
 
 int main()
