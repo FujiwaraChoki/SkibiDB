@@ -85,13 +85,13 @@ int16_t SkibiDB::addTable(std::string tableName, std::string path)
     // Find attributes in the JSON file
     json attributes = j["attributes"];
 
+    json data = j["data"];
+
     // Each attribute is a JSON object (each has a name and type)
     for (const auto &attribute : attributes)
     {
         // Get the attribute name
         std::string name = attribute["name"];
-
-        std::cout << name << std::endl;
 
         // Get the attribute type
         std::string type = attribute["type"];
@@ -106,7 +106,7 @@ int16_t SkibiDB::addTable(std::string tableName, std::string path)
     }
 
     // Create a new table
-    Table table(tableName, finalAttributes);
+    Table table(tableName, finalAttributes, data);
 
     // Add the table to the list of tables
     this->tables.push_back(table);
@@ -136,7 +136,7 @@ int16_t SkibiDB::removeTable(std::string name)
     }
 }
 
-Table SkibiDB::getTable(std::string name) const
+Table &SkibiDB::getTable(std::string name)
 {
     // Find the table with the given name
     auto it = std::find_if(this->tables.begin(), this->tables.end(), [name](const Table &table)
@@ -149,6 +149,7 @@ Table SkibiDB::getTable(std::string name) const
     }
     else
     {
-        throw std::runtime_error("Table not found");
+        std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Table not found: " << name << std::endl;
+        exit(1);
     }
 }

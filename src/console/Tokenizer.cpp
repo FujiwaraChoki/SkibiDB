@@ -61,7 +61,7 @@ std::vector<std::string> Tokenizer::tokenize()
         std::string token = nextToken();
 
         // Add the token to the list
-        tokens.push_back(toUpperCase(token));
+        tokens.push_back(token);
     }
 
     // Return the tokens

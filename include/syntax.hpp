@@ -7,7 +7,7 @@ std::vector<std::string> getSyntax()
 
     // Add the syntax to the vector (SQL syntax)
     syntax.push_back("SELECT [column] FROM [table] WHERE [condition]");
-    syntax.push_back("INSERT INTO [table] VALUES ([value])");
+    syntax.push_back("INSERT INTO [table] ([column], [column], ...) VALUES ([value], [value], ...);");
     syntax.push_back("UPDATE [table] SET [column] = [value] WHERE [condition]");
     syntax.push_back("DELETE FROM [table] WHERE [condition]");
     syntax.push_back("CREATE TABLE [table] ([column] [type], [column] [type], ...)");

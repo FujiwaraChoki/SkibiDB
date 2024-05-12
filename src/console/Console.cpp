@@ -118,8 +118,8 @@ void Console::start()
 
                                 // Add the attribute to the list
                                 std::map<std::string, std::string> attribute;
-                                attribute["name"] = toLowerCase(name);
-                                attribute["type"] = toLowerCase(type);
+                                attribute["name"] = name;
+                                attribute["type"] = type;
 
                                 // Add the attribute to the list of attributes
                                 attributes.push_back(attribute);
@@ -141,6 +141,73 @@ void Console::start()
                         {
                             std::cout << termcolor::on_bright_grey << "=> " << table.getTableName() << termcolor::reset << std::endl;
                         }
+                    }
+                    else if (strcmp("INSERT", token.c_str()) == 0)
+                    {
+                        std::string tableName = tokens[i + 2];
+
+                        // Get all tokens until VALUES word appears
+                        std::vector<std::string> tokensBeforeValues;
+
+                        for (int j = i + 3; j < tokens.size(); j++)
+                        {
+                            if (strcmp("VALUES", tokens[j].c_str()) == 0)
+                            {
+                                break;
+                            }
+
+                            tokensBeforeValues.push_back(tokens[j]);
+                        }
+
+                        // Join the tokens
+                        std::string attributes = join(tokensBeforeValues, " ");
+
+                        // Remove all parantheses from attributes
+                        attributes.erase(std::remove(attributes.begin(), attributes.end(), '('), attributes.end());
+                        attributes.erase(std::remove(attributes.begin(), attributes.end(), ')'), attributes.end());
+
+                        // Remove all commas from attributes
+                        attributes.erase(std::remove(attributes.begin(), attributes.end(), ','), attributes.end());
+
+                        std::vector<std::string> values;
+
+                        // One can insert multiple rows at once, so we need to find all values (each row is a token already)
+                        for (int j = i + 5; j < tokens.size(); j++)
+                        {
+                            if (strcmp("VALUES", tokens[j].c_str()) == 0)
+                            {
+                                // Skip to the next token
+                                continue;
+                            }
+
+                            // Remove all parantheses from values
+                            tokens[j].erase(std::remove(tokens[j].begin(), tokens[j].end(), '('), tokens[j].end());
+                            tokens[j].erase(std::remove(tokens[j].begin(), tokens[j].end(), ')'), tokens[j].end());
+
+                            // Remove all commas from values
+                            tokens[j].erase(std::remove(tokens[j].begin(), tokens[j].end(), ','), tokens[j].end());
+
+                            // Remove all "
+                            tokens[j].erase(std::remove(tokens[j].begin(), tokens[j].end(), '"'), tokens[j].end());
+
+                            // Add the value to the list
+                            values.push_back(tokens[j]);
+                        }
+
+                        // Tokenize the attributes
+                        Tokenizer attrTokenizer(attributes);
+                        std::vector<std::string> tokAttributes = attrTokenizer.tokenize();
+
+                        // Insert the row
+                        Table &table = this->skibiDB->getTable(tableName);
+
+                        // Add the row to the table
+                        table.addRow(tokAttributes, values);
+
+                        // Save the database
+                        this->fileManager->save();
+
+                        std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Inserted row into table " << tableName << std::endl;
                     }
                 }
             }

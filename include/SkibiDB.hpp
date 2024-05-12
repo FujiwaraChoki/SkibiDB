@@ -17,7 +17,7 @@ public:
     int16_t addTable(std::string name, std::string path);
     int16_t removeTable(std::string tableName);
 
-    Table getTable(std::string name) const;
+    Table &getTable(std::string name);
 
     std::vector<Table> getTables() const { return this->tables; }
     void setTables(const std::vector<Table> &tables) { this->tables = tables; }
