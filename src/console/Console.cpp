@@ -33,6 +33,8 @@ Console::~Console()
 // Starts the console
 void Console::start()
 {
+    std::cout << std::endl;
+
     // Loop until the console is stopped
     while (isRunning())
     {
