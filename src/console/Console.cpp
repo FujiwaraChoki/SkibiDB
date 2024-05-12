@@ -100,8 +100,6 @@ void Console::start()
                         attrStr.erase(std::remove(attrStr.begin(), attrStr.end(), '('), attrStr.end());
                         attrStr.erase(std::remove(attrStr.begin(), attrStr.end(), ')'), attrStr.end());
 
-                        std::cout << attrStr << std::endl;
-
                         // Tokenize the attributes
                         Tokenizer attrTokenizer(attrStr);
                         std::vector<std::string> attrTokens = attrTokenizer.tokenize();
@@ -129,7 +127,8 @@ void Console::start()
                         // Create the table
                         this->skibiDB->addTable(tableName, attributes);
 
-                        std::cout << termcolor::grey << "[NOTE] " << termcolor::reset << termcolor::italic << "It is recommended to save the database after creating a table." << termcolor::reset << std::endl;
+                        std::cout << termcolor::grey << "[NOTE] " << termcolor::reset;
+                        std::cout << termcolor::italic << "It is recommended to save the database after creating a table." << termcolor::reset << std::endl;
                     }
                     else if ((strcmp("SHOW", token.c_str()) == 0) && (strcmp("TABLES", tokens[i + 1].c_str()) == 0))
                     {

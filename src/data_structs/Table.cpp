@@ -99,7 +99,7 @@ std::string Table::toString() const
     }
 
     // Add data
-    for (const auto &row : this->getRows())
+    for (const auto &row : this->data)
     {
         nlohmann::json r;
         for (const auto &pair : row)
@@ -127,8 +127,8 @@ void Table::addRow(const std::vector<std::string> &attributes, const std::vector
         row[attributes[i]] = values[i];
     }
 
-    data.push_back(row);
-    numRows++;
+    this->data.push_back(row);
+    this->numRows++;
 }
 
 std::map<std::string, std::string> Table::getRow(int index) const
