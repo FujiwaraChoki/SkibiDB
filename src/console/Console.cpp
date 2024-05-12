@@ -139,7 +139,7 @@ void Console::start()
 
                         for (Table table : tables)
                         {
-                            std::cout << termcolor::on_bright_grey << "=> " << termcolor::reset << table.getTableName() << std::endl;
+                            std::cout << termcolor::on_bright_grey << "=> " << table.getTableName() << termcolor::reset << std::endl;
                         }
                     }
                 }
