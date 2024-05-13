@@ -25,6 +25,8 @@ $ make
 $ ./skibidb
 ```
 
+To see a list of possible commands, type "HELP".
+
 ## License
 
 [MIT](LICENSE)
