@@ -5,7 +5,6 @@ A secure, lightweight, and fast Database Management System written in C++
 ## Libraries
 
 - [nlohmann/json](https://github.com/nlohmann/json)
-- [abdes/cryptopp-cmake](https://github.com/abdes/cryptopp-cmake)
 - [ikalnytskyi/termcolor](https://github.com/ikalnytskyi/termcolor)
 
 ## Installation
@@ -31,4 +30,4 @@ $ ./skibidb
 
 ## Authors
 
-- [Sami Hindi](https://github.com/FujiwaraChoki)
+- [FujiwaraChoki](https://github.com/FujiwaraChoki)
