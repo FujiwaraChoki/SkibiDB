@@ -3,6 +3,7 @@
 #include "termcolor.hpp"
 #include "Table.hpp"
 
+#include <filesystem>
 #include <iostream>
 #include <cstdlib>
 #include <cstdio>
@@ -43,15 +44,21 @@ void FileManager::addFile(std::string file)
 
 std::vector<std::string> FileManager::listFiles(std::string path)
 {
-    std::vector<std::string> files;
+    std::vector<std::string> result;
 
     for (const auto &entry : std::filesystem::directory_iterator(path))
     {
         std::string filename = entry.path().filename().string();
-        files.push_back(filename);
+
+        // Check without altering the original string
+        std::string ext = filename.substr(filename.find_last_of('.'));
+        if (std::find(this->extensions.begin(), this->extensions.end(), ext) != this->extensions.end())
+        {
+            result.push_back(filename);
+        }
     }
 
-    return files;
+    return result;
 }
 
 void FileManager::load()
@@ -63,22 +70,19 @@ void FileManager::load()
     this->files = listFiles(this->skibiPath);
 
     // Load all .skb files
-    for (std::string file : this->files)
+    for (std::string file : listFiles(this->skibiPath))
     {
-        if (file.find(".skb") != std::string::npos)
-        {
-            // Load the file
-            std::ifstream in(this->skibiPath + "\\" + file);
-            std::string content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+        // Load the file
+        std::ifstream in(this->skibiPath + "\\" + file);
+        std::string content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 
-            // Add to files
-            this->addFile(content);
+        // Add to files
+        this->addFile(content);
 
-            // Add the table to the SkibiDB
-            this->skibiDB->addTable(file.substr(0, file.find(".skb")), file);
+        // Add the table to the SkibiDB
+        this->skibiDB->addTable(file.substr(0, file.find(".skb")), file);
 
-            std::cout << termcolor::cyan << "[INFO] " << termcolor::reset << "Loaded file: " << file << std::endl;
-        }
+        std::cout << termcolor::cyan << "[INFO] " << termcolor::reset << "Loaded file: " << file << std::endl;
     }
 }
 

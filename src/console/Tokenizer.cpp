@@ -12,17 +12,32 @@ Tokenizer::Tokenizer(const std::string &str)
 
 std::string Tokenizer::nextToken()
 {
-    // Treat as one token if starts with (, and ends with )
-    if (str[pos] == '(')
+    // Finds the next token
+    size_t start = str.find_first_not_of(" \t\n\r\f\v", pos);
+
+    // Check for quotes
+    if (str[start] == '"')
     {
-        size_t end = str.find_first_of(")", pos);
-        std::string token = str.substr(pos, end - pos + 1);
+        size_t end = start + 1;
+        while (end < str.size() && (str[end] != '"' || str[end - 1] == '\\'))
+        {
+            end++;
+        }
+        std::string token = str.substr(start, end - start);
         pos = end + 1;
         return token;
     }
 
-    // Finds the next token
-    size_t start = str.find_first_not_of(" \t\n\r\f\v", pos);
+    // Check for parentheses
+    if (str[start] == '(')
+    {
+        size_t end = str.find_first_of(")", start + 1);
+        std::string token = str.substr(start, end - start);
+        pos = end + 1;
+        return token;
+    }
+
+    // Find the end of the token
     size_t end = str.find_first_of(" \t\n\r\f\v", start);
 
     // If the end is not found, set it to the end of the string

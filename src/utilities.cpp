@@ -1,9 +1,28 @@
 #include "utilities.hpp"
+
 #include <filesystem>
+#include <algorithm>
 #include <windows.h>
 #include <iostream>
 #include <stdlib.h>
 #include <Lmcons.h>
+#include <iomanip>
+#include <random>
+#include <ctime>
+
+std::string generateUUID()
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, 15);
+
+    std::stringstream ss;
+    for (int i = 0; i < 4; ++i)
+    {
+        ss << std::hex << dis(gen);
+    }
+    return ss.str();
+}
 
 std::string toUpperCase(std::string str)
 {
@@ -55,4 +74,14 @@ std::string buildSkibiPath()
     _putenv_s("SKIBI_PATH", skibiPath.c_str());
 
     return skibiPath;
+}
+
+std::string getCurrentTimestamp()
+{
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+
+    std::string timestamp = std::to_string(1900 + ltm->tm_year) + "-" + std::to_string(1 + ltm->tm_mon) + "-" + std::to_string(ltm->tm_mday) + " " + std::to_string(ltm->tm_hour) + ":" + std::to_string(ltm->tm_min) + ":" + std::to_string(ltm->tm_sec);
+
+    return timestamp;
 }

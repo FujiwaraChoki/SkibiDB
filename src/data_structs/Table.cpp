@@ -8,6 +8,7 @@
 #include "Table.hpp"
 #include "Attribute.hpp"
 #include "termcolor.hpp"
+#include "utilities.hpp"
 
 Table::Table(const std::string &name, const std::vector<Attribute> &attributes)
 {
@@ -125,6 +126,9 @@ void Table::addRow(const std::vector<std::string> &attributes, const std::vector
     for (size_t i = 0; i < attributes.size(); i++)
     {
         row[attributes[i]] = values[i];
+        row["__id__"] = generateUUID();
+        row["__row__"] = std::to_string(this->numRows + 1);
+        row["__created_at__"] = getCurrentTimestamp();
     }
 
     this->data.push_back(row);

@@ -197,8 +197,25 @@ void Console::start()
                             // Remove all commas from values
                             tokens[j].erase(std::remove(tokens[j].begin(), tokens[j].end(), ','), tokens[j].end());
 
-                            // Remove all "
-                            tokens[j].erase(std::remove(tokens[j].begin(), tokens[j].end(), '"'), tokens[j].end());
+                            // If starts with ", then it's a string
+                            if (tokens[j][0] == '"')
+                            {
+                                // Find the position of the closing quote
+                                size_t end = tokens[j].find('"', 1);
+                                if (end != std::string::npos)
+                                {
+                                    // Extract the value between quotes
+                                    std::string value = tokens[j].substr(1, end - 1);
+                                    values.push_back(value);
+                                    continue;
+                                }
+                                else
+                                {
+                                    // Handle error: closing quote not found
+                                    std::cerr << termcolor::yellow << "[WARN] " << termcolor::reset << "Closing quote not found. Skipping..." << std::endl;
+                                    continue;
+                                }
+                            }
 
                             // Add the value to the list
                             values.push_back(tokens[j]);
@@ -214,7 +231,7 @@ void Console::start()
                         // Add the row to the table
                         table.addRow(tokAttributes, values);
                     }
-                    else if (strcmp("SAVE", token.c_str()) == 0)
+                    else if (strcmp("SAVE", toUpperCase(token).c_str()) == 0)
                     {
                         this->fileManager->save();
 
