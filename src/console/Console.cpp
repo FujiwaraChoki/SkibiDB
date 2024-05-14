@@ -246,6 +246,59 @@ void Console::start()
                         std::cout << termcolor::cyan << "[HELP] " << termcolor::reset << "SAVE" << std::endl;
                         std::cout << termcolor::cyan << "[HELP] " << termcolor::reset << "EXIT" << std::endl;
                     }
+                    else if (strcmp("SELECT", token.c_str()) == 0)
+                    {
+                        // Get columns (all tokens from SELECT to FROM)
+                        std::vector<std::string> columns;
+                        int fromIndex = -1;
+
+                        for (int j = i + 1; j < tokens.size(); j++)
+                        {
+                            if (strcmp("FROM", tokens[j].c_str()) == 0)
+                            {
+                                fromIndex = j;
+                                break;
+                            }
+
+                            columns.push_back(tokens[j]);
+                        }
+
+                        // Get table name
+                        std::string tableName = tokens[fromIndex + 1];
+
+                        // Check if WHERE clause exists
+                        std::vector<std::string> whereClause;
+
+                        for (int j = fromIndex + 2; j < tokens.size(); j++)
+                        {
+                            if (strcmp("WHERE", tokens[j].c_str()) == 0)
+                            {
+                                // Skip WHERE
+                                j++;
+                                while (j < tokens.size())
+                                {
+                                    whereClause.push_back(tokens[j]);
+                                    j++;
+                                }
+                                break;
+                            }
+                        }
+
+                        // Get the table
+                        Table &table = this->skibiDB->getTable(tableName);
+
+                        // Select the rows
+                        std::vector<std::map<std::string, std::string>> rows = table.select(columns, whereClause);
+
+                        // Print the rows in table format
+                        // Print table header
+                        std::cout << "----------------------------------------------" << std::endl;
+
+                        std::cout << rows[0]["__id__"] << " | " << rows[0]["__row__"] << " | " << rows[0]["__created_at__"] << std::endl;
+
+                        // Print table footer
+                        std::cout << "----------------------------------------------" << std::endl;
+                    }
                 }
             }
             else

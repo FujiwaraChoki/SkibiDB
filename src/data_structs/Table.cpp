@@ -150,3 +150,92 @@ std::vector<std::map<std::string, std::string>> Table::getRows() const
 {
     return data;
 }
+
+std::vector<std::map<std::string, std::string>> Table::select(const std::vector<std::string> &columns, const std::vector<std::string> &conditionTokens) const
+{
+    std::vector<std::map<std::string, std::string>> result;
+
+    // Ensure conditionTokens has at least three elements
+    if (conditionTokens.size() < 3)
+    {
+        std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Invalid condition format" << std::endl;
+        return result;
+    }
+
+    // Extract condition components
+    const std::string &attribute = conditionTokens[0];
+    const std::string &op = conditionTokens[1];
+    const std::string &valueConst = conditionTokens[2];
+
+    std::string value = valueConst;
+
+    // Remove double quotes from value
+    if (value.front() == '"')
+    {
+        value.erase(0, 1);
+    }
+
+    if (value.back() == '"')
+    {
+        value.pop_back();
+    }
+
+    // Validate operator
+    bool validOperator = (op == "==" || op == "!=" || op == ">" || op == "<" || op == ">=" || op == "<=" || op == "LIKE");
+    if (!validOperator)
+    {
+        std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Invalid operator: " << op << std::endl;
+        return result;
+    }
+
+    // Perform search
+    for (const auto &row : data)
+    {
+        bool match = false;
+
+        // Check if attribute exists in row
+        if (row.find(attribute) != row.end())
+        {
+            const std::string &rowValue = row.at(attribute);
+
+            // Perform comparison based on operator
+            if (op == "==")
+            {
+                match = (strcasecmp(rowValue.c_str(), value.c_str()) == 0);
+            }
+            else if (op == "!=")
+            {
+                match = (rowValue != value);
+            }
+            else if (op == ">")
+            {
+                match = (std::stoi(rowValue) > std::stoi(value));
+            }
+            else if (op == "<")
+            {
+                match = (std::stoi(rowValue) < std::stoi(value));
+            }
+            else if (op == ">=")
+            {
+                match = (std::stoi(rowValue) >= std::stoi(value));
+            }
+            else if (op == "<=")
+            {
+                match = (std::stoi(rowValue) <= std::stoi(value));
+            }
+            else if (op == "LIKE")
+            {
+                match = (toLowerCase(rowValue).find(toLowerCase(value)) != std::string::npos);
+            }
+        }
+
+        // Add row to result if it matches the condition
+        if (match)
+        {
+            std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Match found" << std::endl;
+            result.push_back(row);
+        }
+    }
+
+    return result;
+}
