@@ -1,6 +1,6 @@
 # SkibiDB
 
-A secure, lightweight, and fast Database Management System written in C++
+A windows-only, secure, lightweight, and fast Database Management System written in C++
 
 ## Libraries
 
