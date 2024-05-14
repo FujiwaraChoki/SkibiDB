@@ -1,6 +1,8 @@
+#include <unordered_map>
 #include <algorithm>
 #include <iterator>
 #include <iostream>
+#include <iomanip>
 #include <vector>
 #include <string>
 #include <map>
@@ -243,6 +245,7 @@ void Console::start()
                         std::cout << termcolor::cyan << "[HELP] " << termcolor::reset << "CREATE TABLE <table_name> (<attribute_name> <attribute_type>, ...)" << std::endl;
                         std::cout << termcolor::cyan << "[HELP] " << termcolor::reset << "SHOW TABLES" << std::endl;
                         std::cout << termcolor::cyan << "[HELP] " << termcolor::reset << "INSERT INTO <table_name> (<attribute_name>, ...) VALUES (<value>, ...)" << std::endl;
+                        std::cout << termcolor::cyan << "[HELP] " << termcolor::reset << "SELECT <column_name>, ... FROM <table_name> [WHERE <condition>]" << std::endl;
                         std::cout << termcolor::cyan << "[HELP] " << termcolor::reset << "SAVE" << std::endl;
                         std::cout << termcolor::cyan << "[HELP] " << termcolor::reset << "EXIT" << std::endl;
                     }
@@ -266,38 +269,148 @@ void Console::start()
                         // Get table name
                         std::string tableName = tokens[fromIndex + 1];
 
-                        // Check if WHERE clause exists
-                        std::vector<std::string> whereClause;
+                        // Check if command includes where
+                        size_t whereIndex = getCurrentCommand().find("WHERE");
 
-                        for (int j = fromIndex + 2; j < tokens.size(); j++)
-                        {
-                            if (strcmp("WHERE", tokens[j].c_str()) == 0)
-                            {
-                                // Skip WHERE
-                                j++;
-                                while (j < tokens.size())
-                                {
-                                    whereClause.push_back(tokens[j]);
-                                    j++;
-                                }
-                                break;
-                            }
-                        }
+                        // Init rows
+                        std::vector<std::map<std::string, std::string>> rows;
 
                         // Get the table
                         Table &table = this->skibiDB->getTable(tableName);
 
+                        if (whereIndex != std::string::npos)
+                        {
+
+                            // Check if WHERE clause exists
+                            std::vector<std::string> whereClause;
+
+                            for (int j = fromIndex + 2; j < tokens.size(); j++)
+                            {
+                                if (strcmp("WHERE", tokens[j].c_str()) == 0)
+                                {
+                                    // Skip WHERE
+                                    j++;
+                                    while (j < tokens.size())
+                                    {
+                                        whereClause.push_back(tokens[j]);
+                                        j++;
+                                    }
+                                    break;
+                                }
+                            }
+
+                            rows = table.select(columns, whereClause);
+                        }
+                        else
+                        {
+                            // Call select function without a WHERE clause
+                            rows = table.select(columns); // Empty whereClause
+                        }
+
                         // Select the rows
-                        std::vector<std::map<std::string, std::string>> rows = table.select(columns, whereClause);
+                        std::vector<std::map<std::string, std::string>> visibleRows;
 
-                        // Print the rows in table format
-                        // Print table header
-                        std::cout << "----------------------------------------------" << std::endl;
+                        // Filter on columns
+                        if (columns[0] == "*")
+                        {
+                            visibleRows = rows;
+                        }
+                        else
+                        {
+                            for (const auto &row : rows)
+                            {
+                                for (const auto &pair : row)
+                                {
+                                    if (std::find(columns.begin(), columns.end(), pair.first) != columns.end())
+                                    {
+                                        visibleRows.push_back(row);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
 
-                        std::cout << rows[0]["__id__"] << " | " << rows[0]["__row__"] << " | " << rows[0]["__created_at__"] << std::endl;
+                        if (visibleRows.size() > 0)
+                        {
+                            // Find column names
+                            std::vector<std::string> columnNames;
+                            for (const auto &row : rows)
+                            {
+                                for (const auto &pair : row)
+                                {
+                                    if (std::find(columnNames.begin(), columnNames.end(), pair.first) == columnNames.end())
+                                    {
+                                        columnNames.push_back(pair.first);
+                                    }
+                                }
+                            }
 
-                        // Print table footer
-                        std::cout << "----------------------------------------------" << std::endl;
+                            // Calculate column widths dynamically
+                            std::vector<size_t> columnWidths(columnNames.size(), 0);
+                            for (size_t i = 0; i < columnNames.size(); ++i)
+                            {
+                                columnWidths[i] = columnNames[i].length(); // Initialize with column name lengths
+                                for (const auto &row : rows)
+                                {
+                                    auto it = row.find(columnNames[i]);
+                                    if (it != row.end())
+                                    {
+                                        columnWidths[i] = std::max(columnWidths[i], it->second.length());
+                                    }
+                                }
+                            }
+
+                            // Print separator
+                            for (size_t i = 0; i < columnWidths.size(); ++i)
+                            {
+                                std::cout << std::setw(columnWidths[i] + 2) << std::setfill('_') << "_" << std::setfill(' ') << "|__";
+                            }
+                            std::cout << std::endl;
+
+                            // Print header
+                            for (size_t i = 0; i < columnNames.size(); ++i)
+                            {
+                                std::cout << std::setw(columnWidths[i] + 2) << std::left << termcolor::blue << columnNames[i] << termcolor::reset << "|  ";
+                            }
+                            std::cout << std::endl;
+
+                            // Print separator
+                            for (size_t i = 0; i < columnWidths.size(); ++i)
+                            {
+                                std::cout << std::setw(columnWidths[i] + 2) << std::setfill('_') << "_" << std::setfill(' ') << "|__";
+                            }
+                            std::cout << std::endl;
+
+                            // Print rows
+                            for (const auto &row : rows)
+                            {
+                                for (size_t i = 0; i < columnNames.size(); ++i)
+                                {
+                                    auto it = row.find(columnNames[i]);
+                                    if (it != row.end())
+                                    {
+                                        std::cout << std::setw(columnWidths[i] + 2) << std::left << termcolor::yellow << it->second << termcolor::reset << "|  ";
+                                    }
+                                    else
+                                    {
+                                        std::cout << std::setw(columnWidths[i] + 2) << std::left << " " << "|  ";
+                                    }
+                                }
+                                std::cout << std::endl;
+                            }
+
+                            // Print separator
+                            for (size_t i = 0; i < columnWidths.size(); ++i)
+                            {
+                                std::cout << std::setw(columnWidths[i] + 2) << std::setfill('_') << "_" << std::setfill(' ') << "|__";
+                            }
+                            std::cout << std::endl;
+                        }
+                        else
+                        {
+                            // Alert if no rows found
+                            std::cout << termcolor::yellow << "[WARN] " << termcolor::reset << "No rows found." << std::endl;
+                        }
                     }
                 }
             }

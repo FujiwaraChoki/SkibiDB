@@ -151,9 +151,57 @@ std::vector<std::map<std::string, std::string>> Table::getRows() const
     return data;
 }
 
+std::vector<std::map<std::string, std::string>> Table::select(const std::vector<std::string> &columns) const
+{
+    std::vector<std::map<std::string, std::string>> result;
+
+    // Select all columns if "*" is specified
+    std::cout << columns[0] << std::endl;
+    if (columns.size() == 1 && columns[0] == "*")
+    {
+        return data;
+    }
+
+    // Check if all columns exist
+    for (const auto &column : columns)
+    {
+        if (column != "*" && std::find_if(attributes.begin(), attributes.end(),
+                                          [&](const auto &attr)
+                                          { return attr.getAttributeName() == column; }) == attributes.end())
+        {
+            std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Column not found: " << column << std::endl;
+            return result;
+        }
+    }
+
+    // Extract specified columns
+    for (const auto &row : data)
+    {
+        std::map<std::string, std::string> newRow;
+        for (const auto &column : columns)
+        {
+            if (column == "*")
+            {
+                newRow = row;
+                break;
+            }
+            newRow[column] = row.at(column);
+        }
+        result.push_back(newRow);
+    }
+
+    return result;
+}
+
 std::vector<std::map<std::string, std::string>> Table::select(const std::vector<std::string> &columns, const std::vector<std::string> &conditionTokens) const
 {
     std::vector<std::map<std::string, std::string>> result;
+
+    // Select all columns if "*" is specified
+    if (columns.size() == 1 && columns[0] == "*")
+    {
+        return select(columns);
+    }
 
     // Ensure conditionTokens has at least three elements
     if (conditionTokens.size() < 3)
@@ -232,8 +280,15 @@ std::vector<std::map<std::string, std::string>> Table::select(const std::vector<
         // Add row to result if it matches the condition
         if (match)
         {
-            std::cout << termcolor::green << "[INFO] " << termcolor::reset << "Match found" << std::endl;
-            result.push_back(row);
+            std::map<std::string, std::string> selectedRow;
+            for (const auto &col : columns)
+            {
+                if (row.find(col) != row.end())
+                {
+                    selectedRow[col] = row.at(col);
+                }
+            }
+            result.push_back(selectedRow);
         }
     }
 

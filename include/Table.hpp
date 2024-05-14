@@ -46,6 +46,7 @@ public:
     // Get all rows in the table
     std::vector<std::map<std::string, std::string>> getRows() const;
 
+    std::vector<std::map<std::string, std::string>> select(const std::vector<std::string> &columns) const;
     std::vector<std::map<std::string, std::string>> select(const std::vector<std::string> &columns, const std::vector<std::string> &conditionTokens) const;
 
 private:
