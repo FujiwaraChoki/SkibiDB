@@ -9,6 +9,7 @@
 #include <Lmcons.h>
 #include <iomanip>
 #include <string>
+#include <cctype>
 #include <random>
 #include <ctime>
 #include <regex>
@@ -89,51 +90,37 @@ std::string getCurrentTimestamp()
     return timestamp;
 }
 
-std::string soundex(const std::string &name)
+std::string soundex(const std::string &s)
 {
-    if (name.empty())
+    // Map letters to their corresponding Soundex digits
+    std::unordered_map<char, char> soundexMap{
+        {'b', '1'}, {'f', '1'}, {'p', '1'}, {'v', '1'}, {'c', '2'}, {'g', '2'}, {'j', '2'}, {'k', '2'}, {'q', '2'}, {'s', '2'}, {'x', '2'}, {'z', '2'}, {'d', '3'}, {'t', '3'}, {'l', '4'}, {'m', '5'}, {'n', '5'}, {'r', '6'}, {'p', '7'}, {'h', '7'}};
+
+    // Convert input string to uppercase
+    std::string uppercased;
+    for (char c : s)
     {
-        return "";
+        uppercased += std::toupper(c);
     }
 
-    std::unordered_map<char, char> replacements = {
-        {'B', '1'}, {'F', '1'}, {'P', '1'}, {'V', '1'}, {'C', '2'}, {'G', '2'}, {'J', '2'}, {'K', '2'}, {'Q', '2'}, {'S', '2'}, {'X', '2'}, {'Z', '2'}, {'D', '3'}, {'T', '3'}, {'L', '4'}, {'M', '5'}, {'N', '5'}, {'R', '6'}};
+    // Initialize Soundex code with the first letter of the input string
+    std::string soundexCode = uppercased.substr(0, 1);
 
-    std::string upper_name = toUpperCase(name);
-
-    std::string result(1, upper_name[0]);
-    int count = 1;
-
-    char last = replacements.count(upper_name[0]) ? replacements[upper_name[0]] : '\0';
-
-    for (size_t i = 1; i < upper_name.length() && count < 4; ++i)
+    // Process the rest of the characters in the input string
+    for (size_t i = 1; i < uppercased.length() && soundexCode.length() < 4; ++i)
     {
-        char letter = upper_name[i];
-        if (replacements.count(letter))
+        char digit = soundexMap[uppercased[i]];
+        // If the digit is not the same as the last digit in the Soundex code and not '0'
+        if (digit != soundexCode.back() && digit != '0')
         {
-            char sub = replacements[letter];
-            if (sub != last)
-            {
-                result += sub;
-                count++;
-            }
-            last = sub;
-        }
-        else
-        {
-            if (letter != 'H' && letter != 'W')
-            {
-                last = '\0';
-            }
+            soundexCode += digit;
         }
     }
 
-    while (result.length() < 4)
-    {
-        result += '0';
-    }
+    // Pad with zeros if the code is less than 4 characters long
+    soundexCode.resize(4, '0');
 
-    return result;
+    return soundexCode;
 }
 
 bool isNumber(const std::string &s)

@@ -301,8 +301,19 @@ std::vector<std::map<std::string, std::string>> Table::select(const std::vector<
             }
             else if (op == "~" || op == "LIKE")
             {
-                // NOTE: Test
-                match = (soundex(rowValue).find(soundex(value)) != std::string::npos);
+                // If starts with s/, do soundex search
+                if (value.find("s/") == 0)
+                {
+                    std::string rowSx = soundex(rowValue);
+                    std::string rvSx = soundex(value.substr(2));
+
+                    // Check if soundex value matches exactly
+                    match = (rvSx == rowSx);
+                }
+                else
+                {
+                    match = (toLowerCase(rowValue).find(toLowerCase(value)) != std::string::npos);
+                }
             }
         }
 
