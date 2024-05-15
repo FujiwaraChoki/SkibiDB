@@ -50,11 +50,14 @@ std::vector<std::string> FileManager::listFiles(std::string path)
     {
         std::string filename = entry.path().filename().string();
 
-        // Check without altering the original string
-        std::string ext = filename.substr(filename.find_last_of('.'));
-        if (std::find(this->extensions.begin(), this->extensions.end(), ext) != this->extensions.end())
+        if (!filename.empty())
         {
-            result.push_back(filename);
+            // Check without altering the original string
+            std::string ext = filename.substr(filename.find_last_of('.'));
+            if (std::find(this->extensions.begin(), this->extensions.end(), ext) != this->extensions.end())
+            {
+                result.push_back(filename);
+            }
         }
     }
 
