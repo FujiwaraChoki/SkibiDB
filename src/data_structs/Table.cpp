@@ -170,6 +170,7 @@ std::vector<std::map<std::string, std::string>> Table::getRows() const
     return data;
 }
 
+
 std::vector<std::map<std::string, std::string>> Table::select(const std::vector<std::string> &columns) const
 {
     std::vector<std::map<std::string, std::string>> result;

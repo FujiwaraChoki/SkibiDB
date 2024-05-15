@@ -10,7 +10,7 @@ std::vector<std::string> getSyntax()
     syntax.push_back("INSERT INTO [table] ([column], [column], ...) VALUES ([value], [value], ...);");
     syntax.push_back("DELETE FROM [table] WHERE [condition]");
     syntax.push_back("CREATE TABLE [table] ([column] [type], [column] [type], ...)");
-    syntax.push_back("ALTER TABLE [table] ADD [column] [type]");
+    syntax.push_back("ALTER TABLE [table_name] [ADD/REMOVE] [attribute_name] [attribute_type]");
     syntax.push_back("DROP TABLE [table]");
     syntax.push_back("CREATE INDEX [index] ON [table] ([column])");
 
