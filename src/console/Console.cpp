@@ -12,7 +12,6 @@
 #include "termcolor.hpp"
 #include "utilities.hpp"
 #include "Tokenizer.cpp"
-#include "Attribute.hpp"
 #include "FileManager.hpp"
 
 Console::Console()
@@ -270,48 +269,173 @@ void Console::start()
                     }
                     else if (strcmp("SELECT", token.c_str()) == 0)
                     {
-                        if (tokens.size() >= 6 && strcmp("COUNT", tokens[i + 1].c_str()) == 0 && strcmp("COLUMNS", tokens[i + 2].c_str()) == 0 && strcmp("FROM", tokens[i + 4].c_str()) == 0)
+                        // Get columns (all tokens from SELECT to FROM)
+                        std::vector<std::string> columns;
+                        int fromIndex = -1;
+
+                        for (int j = i + 1; j < tokens.size(); j++)
                         {
-                            std::string tableName = tokens[i + 5];
-
-                            // Retrieve the table from the database
-                            Table &table = this->skibiDB->getTable(tableName);
-
-                            // Retrieve the column names from the table
-                            std::vector<std::string> columnNames = table.getColumnNames();
-
-                            // Count the number of columns
-                            int columnCount = columnNames.size();
-
-                            // Print the column count
-                            std::cout << "Number of columns in table " << tableName << ": " << columnCount << std::endl;
-                        }
-                        else if (tokens.size() >= 4 && strcmp("*", tokens[i + 1].c_str()) == 0 && strcmp("FROM", tokens[i + 2].c_str()) == 0)
-                        {
-                            std::string tableName = tokens[i + 3];
-
-                            // Retrieve the table from the database
-                            Table &table = this->skibiDB->getTable(tableName);
-
-                            // Retrieve the rows from the table
-                            std::vector<std::map<std::string, std::string>> rows = table.getRows();
-
-                            // Print the rows
-                            for (const auto &row : rows)
+                            if (strcmp("FROM", tokens[j].c_str()) == 0)
                             {
-                                for (const auto &column : row)
-                                {
-                                    std::cout << column.first << ": " << column.second << " | ";
-                                }
-                                std::cout << std::endl;
+                                fromIndex = j;
+                                break;
                             }
+
+                            // Remove comma from column name
+                            if (tokens[j].find(",") != std::string::npos)
+                            {
+                                tokens[j].erase(std::remove(tokens[j].begin(), tokens[j].end(), ','), tokens[j].end());
+                            }
+
+                            columns.push_back(tokens[j]);
+                        }
+
+                        // Get table name
+                        std::string tableName = tokens[fromIndex + 1];
+
+                        // Check if command includes where
+                        size_t whereIndex = getCurrentCommand().find("WHERE");
+
+                        // Init rows
+                        std::vector<std::map<std::string, std::string>> rows;
+
+                        // Get the table
+                        Table &table = this->skibiDB->getTable(tableName);
+
+                        if (whereIndex != std::string::npos)
+                        {
+
+                            // Check if WHERE clause exists
+                            std::vector<std::string> whereClause;
+
+                            for (int j = fromIndex + 2; j < tokens.size(); j++)
+                            {
+                                if (strcmp("WHERE", tokens[j].c_str()) == 0)
+                                {
+                                    // Skip WHERE
+                                    j++;
+                                    while (j < tokens.size())
+                                    {
+                                        whereClause.push_back(tokens[j]);
+                                        j++;
+                                    }
+                                    break;
+                                }
+                            }
+
+                            rows = table.select(columns, whereClause);
                         }
                         else
                         {
-                            std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Invalid SELECT syntax." << std::endl;
+                            // Call select function without a WHERE clause
+                            rows = table.select(columns); // Empty whereClause
+                        }
+
+                        // Select the rows
+                        std::vector<std::map<std::string, std::string>> visibleRows;
+
+                        // Filter on columns
+                        if (columns[0] == "*")
+                        {
+                            visibleRows = rows;
+                        }
+                        else
+                        {
+                            for (const auto &row : rows)
+                            {
+                                for (const auto &pair : row)
+                                {
+                                    if (std::find(columns.begin(), columns.end(), pair.first) != columns.end())
+                                    {
+                                        visibleRows.push_back(row);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (visibleRows.size() > 0)
+                        {
+                            // Find column names
+                            std::vector<std::string> columnNames;
+                            for (const auto &row : rows)
+                            {
+                                for (const auto &pair : row)
+                                {
+                                    if (std::find(columnNames.begin(), columnNames.end(), pair.first) == columnNames.end())
+                                    {
+                                        columnNames.push_back(pair.first);
+                                    }
+                                }
+                            }
+
+                            // Calculate column widths dynamically
+                            std::vector<size_t> columnWidths(columnNames.size(), 0);
+                            for (size_t i = 0; i < columnNames.size(); ++i)
+                            {
+                                columnWidths[i] = columnNames[i].length(); // Initialize with column name lengths
+                                for (const auto &row : rows)
+                                {
+                                    auto it = row.find(columnNames[i]);
+                                    if (it != row.end())
+                                    {
+                                        columnWidths[i] = std::max(columnWidths[i], it->second.length());
+                                    }
+                                }
+                            }
+
+                            // Print separator
+                            for (size_t i = 0; i < columnWidths.size(); ++i)
+                            {
+                                std::cout << std::setw(columnWidths[i] + 2) << std::setfill('_') << "_" << std::setfill(' ') << "|__";
+                            }
+                            std::cout << std::endl;
+
+                            // Print header
+                            for (size_t i = 0; i < columnNames.size(); ++i)
+                            {
+                                std::cout << std::setw(columnWidths[i] + 2) << std::left << termcolor::blue << columnNames[i] << termcolor::reset << "|  ";
+                            }
+                            std::cout << std::endl;
+
+                            // Print separator
+                            for (size_t i = 0; i < columnWidths.size(); ++i)
+                            {
+                                std::cout << std::setw(columnWidths[i] + 2) << std::setfill('_') << "_" << std::setfill(' ') << "|__";
+                            }
+                            std::cout << std::endl;
+
+                            // Print rows
+                            for (const auto &row : rows)
+                            {
+                                for (size_t i = 0; i < columnNames.size(); ++i)
+                                {
+                                    auto it = row.find(columnNames[i]);
+                                    if (it != row.end())
+                                    {
+                                        std::cout << std::setw(columnWidths[i] + 2) << std::left << termcolor::yellow << it->second << termcolor::reset << "|  ";
+                                    }
+                                    else
+                                    {
+                                        std::cout << std::setw(columnWidths[i] + 2) << std::left << " " << "|  ";
+                                    }
+                                }
+                                std::cout << std::endl;
+                            }
+
+                            // Print separator
+                            for (size_t i = 0; i < columnWidths.size(); ++i)
+                            {
+                                std::cout << std::setw(columnWidths[i] + 2) << std::setfill('_') << "_" << std::setfill(' ') << "|__";
+                            }
+                            std::cout << std::endl;
+                        }
+                        else
+                        {
+                            // Alert if no rows found
+                            std::cout << termcolor::yellow << "[WARN] " << termcolor::reset << "No rows found." << std::endl;
                         }
                     }
-
                     else if (strcmp("DELETE", token.c_str()) == 0)
                     {
                         std::string tableName = tokens[i + 2];
@@ -347,19 +471,12 @@ void Console::start()
                     }
                     else if (strcmp("UPDATE", token.c_str()) == 0)
                     {
-                        std::string tableName = tokens[i + 2];
-                        if (tableName.empty())
-                        {
-                            std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Table name is empty." << std::endl;
-                            exit(1);
-                        }
-
-                        // Get this table
-                        Table &table = this->skibiDB->getTable(tableName);
-
-                        // Get the set clause
+                        // Update a row
+                        std::string tableName = tokens[i + 1];
                         std::vector<std::string> setClause;
-                        for (int j = i + 3; j < tokens.size(); j++)
+                        std::vector<std::string> whereClause;
+
+                        for (int j = i + 2; j < tokens.size(); j++)
                         {
                             if (strcmp("SET", tokens[j].c_str()) == 0)
                             {
@@ -370,14 +487,8 @@ void Console::start()
                                     setClause.push_back(tokens[j]);
                                     j++;
                                 }
-                                break;
                             }
-                        }
 
-                        // Get the where clause
-                        std::vector<std::string> whereClause;
-                        for (int j = i + 3; j < tokens.size(); j++)
-                        {
                             if (strcmp("WHERE", tokens[j].c_str()) == 0)
                             {
                                 // Skip WHERE
@@ -387,13 +498,8 @@ void Console::start()
                                     whereClause.push_back(tokens[j]);
                                     j++;
                                 }
-                                break;
                             }
                         }
-
-                        // Update the row
-                        //table.updateRow(setClause, whereClause);
-
                     }
 
                     else if (strcmp("DROP", token.c_str()) == 0)
@@ -412,64 +518,6 @@ void Console::start()
 
                         std::cout << termcolor::magenta << "[NOTE] " << termcolor::reset;
                         std::cout << termcolor::italic << "It is recommended to save the database after deleting a table." << termcolor::reset << std::endl;
-                    }
-                    else if ("ALTER", token.c_str() == 0)
-                    {
-                        // Alter table
-                        std::string tableName = tokens[i + 2];
-                        std::string action = tokens[i + 3];
-
-                        if (tableName.empty())
-                        {
-                            std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Table name is empty." << std::endl;
-                            exit(1);
-                        }
-
-                        // Get the table
-                        Table &table = this->skibiDB->getTable(tableName);
-
-                        if (strcmp("ADD", action.c_str()) == 0)
-                        {
-                            // Check if the attribute already exists
-                            for (const auto &attr : table.getAttributes())
-                            {
-                                if (strcmp(toLowerCase(attr.getAttributeName()).c_str(), toLowerCase(tokens[i + 4]).c_str()) == 0)
-                                {
-                                    std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Attribute already exists." << std::endl;
-                                    exit(1);
-                                }
-                            }
-
-                            // Get the attribute name
-                            std::string attributeName = tokens[i + 4];
-
-                            // Get the attribute type
-                            std::string attributeType = tokens[i + 5];
-
-                            // Add the attribute to the table
-                            table.addAttribute(Attribute(attributeName, attributeType));
-
-                            std::cout << termcolor::magenta << "[NOTE] " << termcolor::reset;
-                            std::cout << termcolor::italic << "It is recommended to save the database after altering a table." << termcolor::reset << std::endl;
-                        }
-                        else if (strcmp("REMOVE", action.c_str()) == 0)
-                        {
-                            // Remove an attribute from the table
-                            // ALTER TABLE <table_name> REMOVE <attribute_name>
-
-                            // Get the attribute name
-                            std::string attributeName = tokens[i + 4];
-
-                            // Remove the attribute from the table
-                            table.removeAttribute(attributeName);
-
-                            std::cout << termcolor::magenta << "[NOTE] " << termcolor::reset;
-                            std::cout << termcolor::italic << "It is recommended to save the database after altering a table." << termcolor::reset << std::endl;
-                        }
-                        else
-                        {
-                            std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Invalid action." << std::endl;
-                        }
                     }
                 }
             }
