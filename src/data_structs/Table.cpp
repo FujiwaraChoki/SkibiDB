@@ -180,21 +180,22 @@ std::vector<std::map<std::string, std::string>> Table::select(const std::vector<
         return data;
     }
 
-    // Remove all commas from the attributes
-    std::vector<std::string> attributes;
+    // NOTE: Nessecary?
+    std::vector<std::string> attrs;
     for (const auto &attr : this->attributes)
     {
         std::string attr2 = attr.getAttributeName();
+        // Remove all commas
         attr2.erase(std::remove(attr2.begin(), attr2.end(), ','), attr2.end());
-        attributes.push_back(attr2);
+        attrs.push_back(attr2);
     }
 
     // Check if all columns exist
     for (const auto &column : columns)
     {
-        if (column != "*" && std::find_if(attributes.begin(), attributes.end(),
+        if (column != "*" && std::find_if(attrs.begin(), attrs.end(),
                                           [&](const auto &attr)
-                                          { return attr.getAttributeName() == column; }) == attributes.end())
+                                          { return attr == column; }) == attrs.end())
         {
             std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Column not found: " << column << std::endl;
             return result;
@@ -316,9 +317,13 @@ std::vector<std::map<std::string, std::string>> Table::select(const std::vector<
                     selectedRow = row;
                     break;
                 }
-                if (row.find(col) != row.end())
+                else
                 {
-                    selectedRow[col] = row.at(col);
+                    // If the column exists in the row, add it to the selected row
+                    if (row.find(col) != row.end())
+                    {
+                        selectedRow[col] = row.at(col);
+                    }
                 }
             }
             result.push_back(selectedRow);

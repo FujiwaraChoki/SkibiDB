@@ -136,6 +136,21 @@ void Console::start()
                             }
                         }
 
+                        std::map<std::string, std::string> attr1;
+                        attr1["name"] = "__id";
+                        attr1["type"] = "int";
+                        attributes.push_back(attr1);
+
+                        std::map<std::string, std::string> attr2;
+                        attr2["name"] = "__created_at__";
+                        attr2["type"] = "string";
+                        attributes.push_back(attr2);
+
+                        std::map<std::string, std::string> attr3;
+                        attr3["name"] = "__row__";
+                        attr3["type"] = "int";
+                        attributes.push_back(attr3);
+
                         // Create the table
                         this->skibiDB->addTable(tableName, attributes);
 
@@ -264,6 +279,12 @@ void Console::start()
                             {
                                 fromIndex = j;
                                 break;
+                            }
+
+                            // Remove comma from column name
+                            if (tokens[j].find(",") != std::string::npos)
+                            {
+                                tokens[j].erase(std::remove(tokens[j].begin(), tokens[j].end(), ','), tokens[j].end());
                             }
 
                             columns.push_back(tokens[j]);
