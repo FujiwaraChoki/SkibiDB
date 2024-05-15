@@ -1,4 +1,5 @@
 # SkibiDB
+![](https://media.tenor.com/YzseE_-j48QAAAAM/skibidi-toilet.gif)
 
 A windows-only, secure, lightweight, and fast Database Management System written in C++
 
@@ -33,3 +34,4 @@ To see a list of possible commands, type "HELP".
 ## Authors
 
 - [FujiwaraChoki](https://github.com/FujiwaraChoki)
+- [4g-13Eh](https://github.com/4g-13Eh)
