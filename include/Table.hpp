@@ -49,6 +49,8 @@ public:
     std::vector<std::map<std::string, std::string>> select(const std::vector<std::string> &columns) const;
     std::vector<std::map<std::string, std::string>> select(const std::vector<std::string> &columns, const std::vector<std::string> &conditionTokens) const;
 
+    bool deleteRow(const std::vector<std::string> &conditionTokens);
+
 private:
     int numRows;
     std::string name;

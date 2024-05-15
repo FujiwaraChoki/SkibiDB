@@ -137,8 +137,8 @@ void Console::start()
                         }
 
                         std::map<std::string, std::string> attr1;
-                        attr1["name"] = "__id";
-                        attr1["type"] = "int";
+                        attr1["name"] = "__id__";
+                        attr1["type"] = "string";
                         attributes.push_back(attr1);
 
                         std::map<std::string, std::string> attr2;
@@ -464,18 +464,60 @@ void Console::start()
                             Table &table = this->skibiDB->getTable(tableName);
 
                             // Delete the row
-                            // table.deleteRow(whereClause);
+                            table.deleteRow(whereClause);
 
                             std::cout << termcolor::green << "[SUCCESS] " << termcolor::reset << "Row deleted." << std::endl;
                         }
-                        else
-                        {
-                            // Delete table
-                            this->skibiDB->removeTable(tableName);
+                    }
+                    else if (strcmp("UPDATE", token.c_str()) == 0)
+                    {
+                        // Update a row
+                        std::string tableName = tokens[i + 1];
+                        std::vector<std::string> setClause;
+                        std::vector<std::string> whereClause;
 
-                            std::cout << termcolor::magenta << "[NOTE] " << termcolor::reset;
-                            std::cout << termcolor::italic << "It is recommended to save the database after deleting a table." << termcolor::reset << std::endl;
+                        for (int j = i + 2; j < tokens.size(); j++)
+                        {
+                            if (strcmp("SET", tokens[j].c_str()) == 0)
+                            {
+                                // Skip SET
+                                j++;
+                                while (j < tokens.size())
+                                {
+                                    setClause.push_back(tokens[j]);
+                                    j++;
+                                }
+                            }
+
+                            if (strcmp("WHERE", tokens[j].c_str()) == 0)
+                            {
+                                // Skip WHERE
+                                j++;
+                                while (j < tokens.size())
+                                {
+                                    whereClause.push_back(tokens[j]);
+                                    j++;
+                                }
+                            }
                         }
+                    }
+
+                    else if (strcmp("DROP", token.c_str()) == 0)
+                    {
+                        // Remove table
+                        std::string tableName = tokens[i + 2];
+
+                        if (tableName.empty())
+                        {
+                            std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Table name is empty." << std::endl;
+                            exit(1);
+                        }
+
+                        // Delete table
+                        this->skibiDB->removeTable(tableName);
+
+                        std::cout << termcolor::magenta << "[NOTE] " << termcolor::reset;
+                        std::cout << termcolor::italic << "It is recommended to save the database after deleting a table." << termcolor::reset << std::endl;
                     }
                 }
             }

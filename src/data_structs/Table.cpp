@@ -343,3 +343,106 @@ std::vector<std::map<std::string, std::string>> Table::select(const std::vector<
 
     return result;
 }
+
+bool Table::deleteRow(const std::vector<std::string> &conditionTokens)
+{
+    // Removes a data row if it fulfills certain conditions
+    if (conditionTokens.size() < 3)
+    {
+        std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Invalid condition format" << std::endl;
+        return false;
+    }
+
+    // Extract condition components
+    const std::string &attribute = conditionTokens[0];
+    const std::string &op = conditionTokens[1];
+    std::string value = conditionTokens[2];
+
+    // Remove double quotes from value
+    if (value.front() == '"')
+    {
+        value.erase(0, 1);
+    }
+
+    if (value.back() == '"')
+    {
+        value.pop_back();
+    }
+
+    // Validate operator
+    bool validOperator = (op == "==" || op == "!=" || op == ">" || op == "<" || op == ">=" || op == "<=" || op == "LIKE" || op == "IS" || op == "NOT" || op == "GT" || op == "LT" || op == "GE" || op == "LE" || op == "~");
+    if (!validOperator)
+    {
+        std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Invalid operator: " << op << std::endl;
+        return false;
+    }
+
+    // Perform search
+    for (auto it = data.begin(); it != data.end();)
+    {
+        bool match = false;
+
+        // Check if attribute exists in row
+        if (it->find(attribute) != it->end())
+        {
+            const std::string &rowValue = it->at(attribute);
+
+            // Perform comparison based on operator
+            if (op == "==" || op == "=" || op == "IS")
+            {
+                match = (strcmp(rowValue.c_str(), value.c_str()) == 0);
+            }
+            else if (op == "!=" || op == "NOT")
+            {
+                match = (rowValue != value);
+            }
+            else if (op == ">" || op == "GT")
+            {
+                match = (std::stoi(rowValue) > std::stoi(value));
+            }
+            else if (op == "<" || op == "LT")
+            {
+                match = (std::stoi(rowValue) < std::stoi(value));
+            }
+            else if (op == ">=" || op == "GE")
+            {
+                match = (std::stoi(rowValue) >= std::stoi(value));
+            }
+            else if (op == "<=" || op == "LE")
+            {
+                match = (std::stoi(rowValue) <= std::stoi(value));
+            }
+            else if (op == "~" || op == "LIKE")
+            {
+                // If starts with s/, do soundex search
+                if (value.find("s/") == 0)
+                {
+                    std::string rowSx = soundex(rowValue);
+                    std::string rvSx = soundex(value.substr(2));
+
+                    // Check if soundex value matches exactly
+                    match = (rvSx == rowSx);
+                }
+                else
+                {
+                    match = (toLowerCase(rowValue).find(toLowerCase(value)) != std::string::npos);
+                }
+            }
+        }
+
+        // Remove row if it matches the condition
+        if (match)
+        {
+            it = data.erase(it);
+            numRows--;
+
+            return true;
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    return false;
+}
