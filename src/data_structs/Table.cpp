@@ -115,6 +115,11 @@ std::string Table::toString() const
 
 void Table::addRow(const std::vector<std::string> &attributes, const std::vector<std::string> &values)
 {
+    // Print all values
+    for (const auto &value : values)
+    {
+        std::cerr << value << std::endl;
+    }
     // Check length of vectors, if they are not equal, return
     if (attributes.size() != values.size())
     {
@@ -125,7 +130,21 @@ void Table::addRow(const std::vector<std::string> &attributes, const std::vector
     std::map<std::string, std::string> row;
     for (size_t i = 0; i < attributes.size(); i++)
     {
-        row[attributes[i]] = values[i];
+        // Check if value starts with double: int: or nothing (string)
+        if (values[i].find("int:") == 0)
+        {
+            std::string value = values[i];
+            row[attributes[i]] = value.erase(0, 4);
+        }
+        else if (values[i].find("double:") == 0)
+        {
+            std::string value = values[i];
+            row[attributes[i]] = value.erase(0, 7);
+        }
+        else
+        {
+            row[attributes[i]] = values[i];
+        }
         row["__id__"] = generateUUID();
         row["__row__"] = std::to_string(this->numRows + 1);
         row["__created_at__"] = getCurrentTimestamp();
@@ -156,10 +175,18 @@ std::vector<std::map<std::string, std::string>> Table::select(const std::vector<
     std::vector<std::map<std::string, std::string>> result;
 
     // Select all columns if "*" is specified
-    std::cout << columns[0] << std::endl;
     if (columns.size() == 1 && columns[0] == "*")
     {
         return data;
+    }
+
+    // Remove all commas from the attributes
+    std::vector<std::string> attributes;
+    for (const auto &attr : this->attributes)
+    {
+        std::string attr2 = attr.getAttributeName();
+        attr2.erase(std::remove(attr2.begin(), attr2.end(), ','), attr2.end());
+        attributes.push_back(attr2);
     }
 
     // Check if all columns exist
@@ -198,7 +225,7 @@ std::vector<std::map<std::string, std::string>> Table::select(const std::vector<
     std::vector<std::map<std::string, std::string>> result;
 
     // Select all columns if "*" is specified
-    if (columns.size() == 1 && columns[0] == "*")
+    if (columns.size() == 1 && columns[0] == "*" && conditionTokens.empty())
     {
         return select(columns);
     }
@@ -229,7 +256,7 @@ std::vector<std::map<std::string, std::string>> Table::select(const std::vector<
     }
 
     // Validate operator
-    bool validOperator = (op == "==" || op == "!=" || op == ">" || op == "<" || op == ">=" || op == "<=" || op == "LIKE");
+    bool validOperator = (op == "==" || op == "!=" || op == ">" || op == "<" || op == ">=" || op == "<=" || op == "LIKE" || op == "IS" || op == "NOT" || op == "GT" || op == "LT" || op == "GE" || op == "LE" || op == "~");
     if (!validOperator)
     {
         std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Invalid operator: " << op << std::endl;
@@ -247,33 +274,34 @@ std::vector<std::map<std::string, std::string>> Table::select(const std::vector<
             const std::string &rowValue = row.at(attribute);
 
             // Perform comparison based on operator
-            if (op == "==")
+            if (op == "==" || op == "=" || op == "IS")
             {
-                match = (strcasecmp(rowValue.c_str(), value.c_str()) == 0);
+                match = (strcmp(rowValue.c_str(), value.c_str()) == 0);
             }
-            else if (op == "!=")
+            else if (op == "!=" || op == "NOT")
             {
                 match = (rowValue != value);
             }
-            else if (op == ">")
+            else if (op == ">" || op == "GT")
             {
                 match = (std::stoi(rowValue) > std::stoi(value));
             }
-            else if (op == "<")
+            else if (op == "<" || op == "LT")
             {
                 match = (std::stoi(rowValue) < std::stoi(value));
             }
-            else if (op == ">=")
+            else if (op == ">=" || op == "GE")
             {
                 match = (std::stoi(rowValue) >= std::stoi(value));
             }
-            else if (op == "<=")
+            else if (op == "<=" || op == "LE")
             {
                 match = (std::stoi(rowValue) <= std::stoi(value));
             }
-            else if (op == "LIKE")
+            else if (op == "~" || op == "LIKE")
             {
-                match = (toLowerCase(rowValue).find(toLowerCase(value)) != std::string::npos);
+                // NOTE: Test
+                match = (soundex(rowValue).find(soundex(value)) != std::string::npos);
             }
         }
 
@@ -283,6 +311,11 @@ std::vector<std::map<std::string, std::string>> Table::select(const std::vector<
             std::map<std::string, std::string> selectedRow;
             for (const auto &col : columns)
             {
+                if (columns[0] == "*")
+                {
+                    selectedRow = row;
+                    break;
+                }
                 if (row.find(col) != row.end())
                 {
                     selectedRow[col] = row.at(col);

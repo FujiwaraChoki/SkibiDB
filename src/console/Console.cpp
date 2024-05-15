@@ -35,13 +35,11 @@ Console::~Console()
 // Starts the console
 void Console::start()
 {
-    std::cout << std::endl;
-
     // Loop until the console is stopped
     while (isRunning())
     {
         // Take user input
-        std::string command = input<std::string>("> ");
+        std::string command = input<std::string>("\n> ");
 
         // Set the current command
         setCurrentCommand(command);
@@ -174,53 +172,58 @@ void Console::start()
                         // Join the tokens
                         std::string attributes = join(tokensBeforeValues, " ");
 
-                        // Remove all parantheses from attributes
+                        // Remove all parentheses and commas from attributes
                         attributes.erase(std::remove(attributes.begin(), attributes.end(), '('), attributes.end());
                         attributes.erase(std::remove(attributes.begin(), attributes.end(), ')'), attributes.end());
-
-                        // Remove all commas from attributes
                         attributes.erase(std::remove(attributes.begin(), attributes.end(), ','), attributes.end());
 
                         std::vector<std::string> values;
 
-                        // One can insert multiple rows at once, so we need to find all values (each row is a token already)
+                        // Extract the values
+                        std::string valuesString;
                         for (int j = i + 5; j < tokens.size(); j++)
                         {
                             if (strcmp("VALUES", tokens[j].c_str()) == 0)
                             {
-                                // Skip to the next token
+                                // Move to the next token
                                 continue;
                             }
 
-                            // Remove all parantheses from values
-                            tokens[j].erase(std::remove(tokens[j].begin(), tokens[j].end(), '('), tokens[j].end());
-                            tokens[j].erase(std::remove(tokens[j].begin(), tokens[j].end(), ')'), tokens[j].end());
+                            valuesString = tokens[j];
+                            break;
+                        }
 
-                            // Remove all commas from values
-                            tokens[j].erase(std::remove(tokens[j].begin(), tokens[j].end(), ','), tokens[j].end());
-
-                            // If starts with ", then it's a string
-                            if (tokens[j][0] == '"')
+                        // Split valuesString by commas
+                        std::istringstream iss(valuesString);
+                        std::string value;
+                        while (std::getline(iss, value, ','))
+                        {
+                            // Remove leading and trailing whitespaces
+                            value.erase(0, value.find_first_not_of(" \t\n\r\f\v"));
+                            value.erase(value.find_last_not_of(" \t\n\r\f\v") + 1);
+                            if (isNumber(value))
                             {
-                                // Find the position of the closing quote
-                                size_t end = tokens[j].find('"', 1);
-                                if (end != std::string::npos)
+                                // check if double or int
+                                if (value.find('.') != std::string::npos)
                                 {
-                                    // Extract the value between quotes
-                                    std::string value = tokens[j].substr(1, end - 1);
-                                    values.push_back(value);
-                                    continue;
+                                    // double
+                                    value = "double:" + value;
                                 }
                                 else
                                 {
-                                    // Handle error: closing quote not found
-                                    std::cerr << termcolor::yellow << "[WARN] " << termcolor::reset << "Closing quote not found. Skipping..." << std::endl;
-                                    continue;
+                                    // int
+                                    value = "int:" + value;
                                 }
                             }
 
-                            // Add the value to the list
-                            values.push_back(tokens[j]);
+                            // Remove double quotes
+                            value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
+
+                            // Remove ( and )
+                            value.erase(std::remove(value.begin(), value.end(), '('), value.end());
+                            value.erase(std::remove(value.begin(), value.end(), ')'), value.end());
+
+                            values.push_back(value);
                         }
 
                         // Tokenize the attributes
@@ -410,6 +413,47 @@ void Console::start()
                         {
                             // Alert if no rows found
                             std::cout << termcolor::yellow << "[WARN] " << termcolor::reset << "No rows found." << std::endl;
+                        }
+                    }
+                    else if (strcmp("DELETE", token.c_str()) == 0)
+                    {
+                        std::string tableName = tokens[i + 2];
+
+                        if (strcmp("FROM", tokens[i + 1].c_str()) == 0)
+                        {
+                            // Delete a row
+                            std::vector<std::string> whereClause;
+
+                            for (int j = i + 3; j < tokens.size(); j++)
+                            {
+                                if (strcmp("WHERE", tokens[j].c_str()) == 0)
+                                {
+                                    // Skip WHERE
+                                    j++;
+                                    while (j < tokens.size())
+                                    {
+                                        whereClause.push_back(tokens[j]);
+                                        j++;
+                                    }
+                                    break;
+                                }
+                            }
+
+                            // Get the table
+                            Table &table = this->skibiDB->getTable(tableName);
+
+                            // Delete the row
+                            // table.deleteRow(whereClause);
+
+                            std::cout << termcolor::green << "[SUCCESS] " << termcolor::reset << "Row deleted." << std::endl;
+                        }
+                        else
+                        {
+                            // Delete table
+                            this->skibiDB->removeTable(tableName);
+
+                            std::cout << termcolor::magenta << "[NOTE] " << termcolor::reset;
+                            std::cout << termcolor::italic << "It is recommended to save the database after deleting a table." << termcolor::reset << std::endl;
                         }
                     }
                 }

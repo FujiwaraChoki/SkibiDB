@@ -18,4 +18,9 @@ std::string buildSkibiPath();
 
 std::string getCurrentTimestamp();
 
+std::string soundex(const std::string &name);
+
+bool isNumber(const std::string &s);
+bool isNumber(const char &c);
+
 #endif // UTILITIES_HPP

@@ -1,66 +1,73 @@
 #include <stdint.h>
-
 #include <iostream>
-#include <fstream>
 #include <string>
+#include <vector>
 
 #include "termcolor.hpp"
 #include "console/Console.cpp"
 
-std::string getRootDir()
-{
-    std::string ROOT_PATH = __FILE__;
-    size_t found = ROOT_PATH.find_last_of("/\\");
-
-	if (found != std::string::npos)
-	{
-		ROOT_PATH = ROOT_PATH.substr(0, found);
-	}
-
-	// Check if ends with src, if yes, remove it (level up), then return
-	if (ROOT_PATH.substr(ROOT_PATH.length() - 3) == "src")
-	{
-		ROOT_PATH = ROOT_PATH.substr(0, ROOT_PATH.length() - 3);
-	}
-
-    return ROOT_PATH;
-}
-
 void printAscii()
 {
-	/* Prints the Logo ASCII Art. */
-	std::string asciiArtPath = getRootDir() + "/assets/art.txt";
+    std::vector<std::string> ascii = {
+        "                                                                               ",
+        "       .--.--.         ,-.                                ,---,        ,---,.      ",
+        "      /  /    '.   ,--/ /|   ,--,     ,---,     ,--,    .'  .' `\\    ,'  .'  \\     ",
+        "     |  :  /`. / ,--. :/ | ,--.'|   ,---.'|   ,--.'|  ,---.'     \\ ,---.' .' |     ",
+        "     ;  |  |--`  :  : ' /  |  |,    |   | :   |  |,   |   |  .`\\  ||   |  |: |     ",
+        "     |  :  ;_    |  '  /   `--'_    :   : :   `--'_   :   : |  '  |:   :  :  /     ",
+        "      \\  \\    `. '  |  :   ,' ,'|   :     |,-.,' ,'|  |   ' '  ;  ::   |    ;      ",
+        "       `----.   \\|  |   \\  '  | |   |   : '  |'  | |  '   | ;  .  ||   :     \\     ",
+        "       __ \\  \\  |'  : |. \\ |  | :   |   |  / :|  | :  |   | :  |  '|   |   . |     ",
+        "      /  /`--'  /|  | ' \\ \\'  : |__ '   : |: |'  : |__'   : | /  ; '   :  '; |     ",
+        "     '--'.     / '  : |--' |  | '.'||   | '/ :|  | '.'|   | '` ,/  |   |  | ;      ",
+        "       `--'---'  ;  |,'    ;  :    ;|   :    |;  :    ;   :  .'    |   :   /       ",
+        "                 '--'      |  ,   / /    \\  / |  ,   /|   ,.'      |   | ,'        ",
+        "                            ---`-'  `-'----'   ---`-' '---'        `----'          ",
+        "                                                                               ",
+    };
 
-	std::cout << asciiArtPath << std::endl;
+    // Find the length of the longest line
+    size_t max_length = 0;
+    for (const auto &line : ascii)
+    {
+        if (line.length() > max_length)
+        {
+            max_length = line.length();
+        }
+    }
 
-	// Read from assets/art.txt
-	std::ifstream file(asciiArtPath);
+    // Print each line with blue background and padding to ensure rectangle shape
+    for (const auto &line : ascii)
+    {
+        std::cout << termcolor::on_blue;
+        std::cout << line;
+        // Pad the line with spaces if it's shorter than the max length
+        if (line.length() < max_length)
+        {
+            std::cout << std::string(max_length - line.length(), ' ');
+        }
+        std::cout << termcolor::reset << std::endl;
+    }
 
-	// Print the ASCII Art
-	std::string line;
-	while (std::getline(file, line))
-	{
-		std::cout << termcolor::on_blue << line << termcolor::reset << std::endl;
-	}
-
-	// Close the file
-	file.close();
-
-	std::cout << std::endl
-			  << std::endl;
-	std::cout << termcolor::cyan << "[INFO] " << termcolor::reset << "Root directory: " << getRootDir() << std::endl;
+    std::cout << std::endl;
 }
 
 int main()
 {
-	printAscii();
+    printAscii();
+    try
+    {
+        // Create a new console
+        Console console;
 
-	// Create a new console
-	Console console;
+        // Run the console
+        console.start();
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << termcolor::red << e.what() << termcolor::reset << std::endl;
+    }
 
-	// Run the console
-	console.start();
-
-	// Return status code
-	return EXIT_SUCCESS;
+    // Return status code
+    return 0;
 }

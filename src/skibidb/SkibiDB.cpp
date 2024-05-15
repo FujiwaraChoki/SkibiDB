@@ -85,6 +85,25 @@ int16_t SkibiDB::addTable(std::string tableName, std::string path)
 
     json data = j["data"];
 
+    // Loop through data, loop through each attribute in the object, and see if it contains int: or double:
+    for (auto &row : data)
+    {
+        for (auto &attribute : row.items())
+        {
+            std::string value = attribute.value();
+            if (value.find("int:") != std::string::npos)
+            {
+                value = value.erase(0, 4);
+                attribute.value() = value;
+            }
+            else if (value.find("double:") != std::string::npos)
+            {
+                value = value.erase(0, 7);
+                attribute.value() = value;
+            }
+        }
+    }
+
     // Each attribute is a JSON object (each has a name and type)
     for (const auto &attribute : attributes)
     {

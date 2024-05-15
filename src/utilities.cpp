@@ -1,5 +1,6 @@
 #include "utilities.hpp"
 
+#include <unordered_map>
 #include <filesystem>
 #include <algorithm>
 #include <windows.h>
@@ -7,8 +8,10 @@
 #include <stdlib.h>
 #include <Lmcons.h>
 #include <iomanip>
+#include <string>
 #include <random>
 #include <ctime>
+#include <regex>
 
 std::string generateUUID()
 {
@@ -84,4 +87,69 @@ std::string getCurrentTimestamp()
     std::string timestamp = std::to_string(1900 + ltm->tm_year) + "-" + std::to_string(1 + ltm->tm_mon) + "-" + std::to_string(ltm->tm_mday) + " " + std::to_string(ltm->tm_hour) + ":" + std::to_string(ltm->tm_min) + ":" + std::to_string(ltm->tm_sec);
 
     return timestamp;
+}
+
+std::string soundex(const std::string &name)
+{
+    if (name.empty())
+    {
+        return "";
+    }
+
+    std::unordered_map<char, char> replacements = {
+        {'B', '1'}, {'F', '1'}, {'P', '1'}, {'V', '1'}, {'C', '2'}, {'G', '2'}, {'J', '2'}, {'K', '2'}, {'Q', '2'}, {'S', '2'}, {'X', '2'}, {'Z', '2'}, {'D', '3'}, {'T', '3'}, {'L', '4'}, {'M', '5'}, {'N', '5'}, {'R', '6'}};
+
+    std::string upper_name = toUpperCase(name);
+
+    std::string result(1, upper_name[0]);
+    int count = 1;
+
+    char last = replacements.count(upper_name[0]) ? replacements[upper_name[0]] : '\0';
+
+    for (size_t i = 1; i < upper_name.length() && count < 4; ++i)
+    {
+        char letter = upper_name[i];
+        if (replacements.count(letter))
+        {
+            char sub = replacements[letter];
+            if (sub != last)
+            {
+                result += sub;
+                count++;
+            }
+            last = sub;
+        }
+        else
+        {
+            if (letter != 'H' && letter != 'W')
+            {
+                last = '\0';
+            }
+        }
+    }
+
+    while (result.length() < 4)
+    {
+        result += '0';
+    }
+
+    return result;
+}
+
+bool isNumber(const std::string &s)
+{
+    std::regex integerRegex("^[-+]?[0-9]+$");
+    std::regex doubleRegex("^[-+]?[0-9]*\\.?[0-9]+$");
+
+    if (std::regex_match(s, integerRegex) || std::regex_match(s, doubleRegex))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool isNumber(const char &c)
+{
+    return c >= '0' && c <= '9';
 }

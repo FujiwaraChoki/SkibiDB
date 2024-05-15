@@ -1,4 +1,5 @@
 #include "Tokenizer.hpp"
+#include "utilities.hpp"
 
 Tokenizer::Tokenizer()
     : pos(0)
