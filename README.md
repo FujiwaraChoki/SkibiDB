@@ -1,5 +1,5 @@
 # SkibiDB
-[](https://media.tenor.com/YzseE_-j48QAAAAM/skibidi-toilet.gif)
+![](https://media.tenor.com/YzseE_-j48QAAAAM/skibidi-toilet.gif)
 
 A windows-only, secure, lightweight, and fast Database Management System written in C++
 
