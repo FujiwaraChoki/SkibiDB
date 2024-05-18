@@ -26,8 +26,16 @@ public:
     // Remove an attribute from the table
     void removeAttribute(const std::string &name);
 
+    // Drop a column
+    void dropColumn(const std::string &name);
+
+    void addColumn(const Attribute &attribute);
+
+    void updateRow(const std::vector<std::string> &setTokens, const std::vector<std::string> &conditionTokens);
+
     // Get the attribute with the given name
-    Attribute getAttribute(const std::string &name) const;
+    Attribute
+    getAttribute(const std::string &name) const;
 
     // Get the attribute with the given index
     Attribute getAttribute(int index) const;

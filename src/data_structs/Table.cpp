@@ -62,6 +62,174 @@ void Table::removeAttribute(const std::string &name)
     }
 }
 
+void Table::dropColumn(const std::string &name)
+{
+    for (auto it = attributes.begin(); it != attributes.end(); ++it)
+    {
+        if (it->getAttributeName() == name)
+        {
+            attributes.erase(it);
+            return;
+        }
+    }
+}
+
+void Table::addColumn(const Attribute &attribute)
+{
+    // Add the attribute to the list of attributes
+    attributes.push_back(attribute);
+}
+
+void Table::updateRow(const std::vector<std::string> &setTokens, const std::vector<std::string> &conditionTokens)
+{
+    // Update a data row if it fulfills certain conditions
+    if (conditionTokens.size() < 3)
+    {
+        std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Invalid condition format" << std::endl;
+        return;
+    }
+
+    // Extract condition components
+    const std::string &attribute = conditionTokens[0];
+    const std::string &op = conditionTokens[1];
+    std::string value = conditionTokens[2]; // Make a copy of the value string
+
+    // Remove double quotes from value
+    if (value.front() == '"')
+    {
+        value.erase(0, 1);
+    }
+
+    if (value.back() == '"')
+    {
+        value.pop_back();
+    }
+
+    // Validate operator
+    bool validOperator = (op == "==" || op == "!=" || op == ">" || op == "<" || op == ">=" || op == "<=" || op == "LIKE" || op == "IS" || op == "NOT" || op == "GT" || op == "LT" || op == "GE" || op == "LE" || op == "~");
+    if (!validOperator)
+    {
+        std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Invalid operator: " << op << std::endl;
+        return;
+    }
+
+    // Perform search
+    for (auto it = data.begin(); it != data.end(); ++it)
+    {
+        bool match = false;
+
+        // Check if attribute exists in row
+        if (it->find(attribute) != it->end())
+        {
+            const std::string &rowValue = it->at(attribute);
+
+            // Perform comparison based on operator
+            if (op == "==" || op == "=" || op == "IS")
+            {
+                match = (strcmp(rowValue.c_str(), value.c_str()) == 0);
+            }
+            else if (op == "!=" || op == "NOT")
+            {
+                match = (rowValue != value);
+            }
+            else if (op == ">" || op == "GT")
+            {
+                match = (std::stoi(rowValue) > std::stoi(value));
+            }
+            else if (op == "<" || op == "LT")
+            {
+                match = (std::stoi(rowValue) < std::stoi(value));
+            }
+            else if (op == ">=" || op == "GE")
+            {
+                match = (std::stoi(rowValue) >= std::stoi(value));
+            }
+            else if (op == "<=" || op == "LE")
+            {
+                match = (std::stoi(rowValue) <= std::stoi(value));
+            }
+            else if (op == "~" || op == "LIKE")
+            {
+                // If starts with s/, do soundex search
+                if (value.find("s/") == 0)
+                {
+                    std::string rowSx = soundex(rowValue);
+                    std::string rvSx = soundex(value.substr(2));
+
+                    // Check if soundex value matches exactly
+                    match = (rvSx == rowSx);
+                }
+                else
+                {
+                    match = (toLowerCase(rowValue).find(toLowerCase(value)) != std::string::npos);
+                }
+            }
+
+            // Update row if it matches the condition
+            if (match)
+            {
+                std::string columnName = setTokens[0];
+                std::string newValue = setTokens[2];
+
+                // Remove double quotes from value
+                if (newValue.front() == '"')
+                {
+                    newValue.erase(0, 1);
+                }
+
+                if (newValue.back() == '"')
+                {
+                    newValue.pop_back();
+                }
+
+                // Check if value starts with double: int: or nothing (string)
+                if (newValue.find("int:") == 0)
+                {
+                    std::string value = newValue;
+
+                    // If column exists, use at, if not, use insert
+                    if (it->find(columnName) == it->end())
+                    {
+                        it->insert({columnName, value.erase(0, 4)});
+                    }
+                    else
+                    {
+                        it->at(columnName) = value.erase(0, 4);
+                    }
+                }
+                else if (newValue.find("double:") == 0)
+                {
+                    std::string value = newValue;
+
+                    // If column exists, use at, if not, use insert
+                    if (it->find(columnName) == it->end())
+                    {
+                        it->insert({columnName, value.erase(0, 7)});
+                    }
+                    else
+                    {
+                        it->at(columnName) = value.erase(0, 7);
+                    }
+                }
+                else
+                {
+                    // If column exists, use at, if not, use insert
+                    if (it->find(columnName) == it->end())
+                    {
+                        it->insert({columnName, newValue});
+                    }
+                    else
+                    {
+                        it->at(columnName) = newValue;
+                    }
+                }
+
+                break;
+            }
+        }
+    }
+}
+
 Attribute Table::getAttribute(const std::string &name) const
 {
     for (const auto &attribute : attributes)
@@ -169,7 +337,6 @@ std::vector<std::map<std::string, std::string>> Table::getRows() const
 {
     return data;
 }
-
 
 std::vector<std::map<std::string, std::string>> Table::select(const std::vector<std::string> &columns) const
 {

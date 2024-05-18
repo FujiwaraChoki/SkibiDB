@@ -517,12 +517,20 @@ void Console::start()
 
                         for (int j = i + 2; j < tokens.size(); j++)
                         {
+                            // Correctly allocate set and where clauses
                             if (strcmp("SET", tokens[j].c_str()) == 0)
                             {
-                                // Skip SET
                                 j++;
                                 while (j < tokens.size())
                                 {
+                                    if (strcmp("WHERE", tokens[j].c_str()) == 0)
+                                    {
+                                        break;
+                                    }
+
+                                    // Remove double quotes
+                                    tokens[j].erase(std::remove(tokens[j].begin(), tokens[j].end(), '"'), tokens[j].end());
+
                                     setClause.push_back(tokens[j]);
                                     j++;
                                 }
@@ -530,17 +538,106 @@ void Console::start()
 
                             if (strcmp("WHERE", tokens[j].c_str()) == 0)
                             {
-                                // Skip WHERE
                                 j++;
                                 while (j < tokens.size())
                                 {
+                                    // Remove double quotes
+                                    tokens[j].erase(std::remove(tokens[j].begin(), tokens[j].end(), '"'), tokens[j].end());
+
                                     whereClause.push_back(tokens[j]);
                                     j++;
                                 }
                             }
                         }
-                    }
 
+                        // Get the table
+                        Table &table = this->skibiDB->getTable(tableName);
+
+                        // Update the row
+                        table.updateRow(setClause, whereClause);
+
+                        // Example: UPDATE table_name SET column_name = value WHERE column_name = value
+                    }
+                    else if (strcmp("ALTER", token.c_str()) == 0 && strcmp("TABLE", tokens[i + 1].c_str()) == 0)
+                    {
+                        // Alter table
+                        std::string tableName = tokens[i + 2];
+                        std::string action = tokens[i + 3];
+
+                        if (tableName.empty())
+                        {
+                            std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Table name is empty." << std::endl;
+                            exit(1);
+                        }
+
+                        if (action.empty())
+                        {
+                            std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Action is empty." << std::endl;
+                            exit(1);
+                        }
+
+                        // Get the table
+                        Table &table = this->skibiDB->getTable(tableName);
+
+                        if (strcmp("ADD", action.c_str()) == 0)
+                        {
+                            // Add column
+                            std::string column = tokens[i + 4];
+
+                            // Get column name and type (embedded in parentheses)
+                            std::string columnWithout = column.substr(column.find("(") + 1, column.find(")") - column.find("(") - 1);
+
+                            // Tokenize
+                            // TODO: Replace tokenizer with simpler mechanism (to save mem)
+                            Tokenizer columnTokenizer(columnWithout);
+                            std::vector<std::string> columnTokens = columnTokenizer.tokenize();
+                            std::string columnName = columnTokens[0];
+                            std::string columnType = columnTokens[1];
+
+                            if (columnName.empty())
+                            {
+                                std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Column name is empty." << std::endl;
+                                exit(1);
+                            }
+
+                            if (columnType.empty())
+                            {
+                                std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Column type is empty." << std::endl;
+                                exit(1);
+                            }
+
+                            Attribute attr;
+                            attr.setAttributeName(columnName);
+                            attr.setAttributeType(columnType);
+
+                            // Add the column
+                            table.addColumn(attr);
+
+                            std::cout << termcolor::magenta << "[NOTE] " << termcolor::reset;
+                            std::cout << termcolor::italic << "It is recommended to save the database after adding a column." << termcolor::reset << std::endl;
+                        }
+                        else if (strcmp("DROP", action.c_str()) == 0)
+                        {
+                            // Drop column
+                            std::string columnName = tokens[i + 4];
+
+                            if (columnName.empty())
+                            {
+                                std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Column name is empty." << std::endl;
+                                exit(1);
+                            }
+
+                            // Drop the column
+                            table.dropColumn(columnName);
+
+                            std::cout << termcolor::magenta << "[NOTE] " << termcolor::reset;
+                            std::cout << termcolor::italic << "It is recommended to save the database after dropping a column." << termcolor::reset << std::endl;
+                        }
+                        else
+                        {
+                            std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Invalid action." << std::endl;
+                        }
+                    }
                     else if (strcmp("DROP", token.c_str()) == 0)
                     {
                         // Remove table
