@@ -1,5 +1,4 @@
 # SkibiDB
-![](https://media.tenor.com/YzseE_-j48QAAAAM/skibidi-toilet.gif)
 
 A windows-only, secure, lightweight, and fast Database Management System written in C++
 
@@ -26,6 +25,42 @@ $ ./skibidb
 ```
 
 To see a list of possible commands, type "HELP".
+
+# Examples
+
+### Create a `users` table
+
+`CREATE TABLE users`
+
+`SAVE`
+
+### Add a user
+
+`INSERT INTO users (username, age) VALUES ("FujiwaraChoki", 17)`
+
+`SAVE`
+
+### Select specific user
+
+`SELECT username FROM users WHERE username ~ "s/FujiwaraShoki"`
+
+The `s/` here is a flag you can add if you'd like to use the soundex search. More information [here](https://en.wikipedia.org/wiki/Soundex).
+
+`~` is the same as `LIKE`, it doesn't matter which one you provide.
+
+### Delete a user
+
+`DELETE FROM users WHERE username LIKE "s/Fujiwarashoki"`
+
+This commands deletes every user, who's username sounds like "Fujiwarashoki".
+
+`SAVE`
+
+There's also the basic `DROP`, `UPDATE` and `EXIT` commands.
+
+# Functions
+
+The only supported function as of now, is `COUNT`.
 
 ## License
 
