@@ -14,6 +14,13 @@
 #include "Tokenizer.cpp"
 #include "FileManager.hpp"
 
+// For "clear" command later
+#ifdef _WIN32
+#define CLEAR "cls"
+#else
+#define CLEAR "clear"
+#endif
+
 Console::Console()
 {
     // Set the console to running
@@ -272,6 +279,8 @@ void Console::start()
                         // Get columns (all tokens from SELECT to FROM)
                         std::vector<std::string> columns;
                         int fromIndex = -1;
+                        int countIndex = -1;
+                        std::string countColumn;
 
                         for (int j = i + 1; j < tokens.size(); j++)
                         {
@@ -287,7 +296,19 @@ void Console::start()
                                 tokens[j].erase(std::remove(tokens[j].begin(), tokens[j].end(), ','), tokens[j].end());
                             }
 
-                            columns.push_back(tokens[j]);
+                            // Add column between brackets if COUNT
+                            if (tokens[j].find("COUNT") != std::string::npos)
+                            {
+                                // Extract the column name
+                                std::string columnName = tokens[j].substr(tokens[j].find("(") + 1, tokens[j].find(")") - tokens[j].find("(") - 1);
+                                countColumn = columnName;
+                                columns.push_back(columnName);
+                            }
+                            else
+                            {
+                                // Add column to columns
+                                columns.push_back(tokens[j]);
+                            }
                         }
 
                         // Get table name
@@ -384,49 +405,61 @@ void Console::start()
                                 }
                             }
 
-                            // Print separator
-                            for (size_t i = 0; i < columnWidths.size(); ++i)
+                            // Check if COUNT is in the command
+                            if (countColumn != "")
                             {
-                                std::cout << std::setw(columnWidths[i] + 2) << std::setfill('_') << "_" << std::setfill(' ') << "|__";
-                            }
-                            std::cout << std::endl;
-
-                            // Print header
-                            for (size_t i = 0; i < columnNames.size(); ++i)
-                            {
-                                std::cout << std::setw(columnWidths[i] + 2) << std::left << termcolor::blue << columnNames[i] << termcolor::reset << "|  ";
-                            }
-                            std::cout << std::endl;
-
-                            // Print separator
-                            for (size_t i = 0; i < columnWidths.size(); ++i)
-                            {
-                                std::cout << std::setw(columnWidths[i] + 2) << std::setfill('_') << "_" << std::setfill(' ') << "|__";
-                            }
-                            std::cout << std::endl;
-
-                            // Print rows
-                            for (const auto &row : rows)
-                            {
-                                for (size_t i = 0; i < columnNames.size(); ++i)
-                                {
-                                    auto it = row.find(columnNames[i]);
-                                    if (it != row.end())
-                                    {
-                                        std::cout << std::setw(columnWidths[i] + 2) << std::left << termcolor::yellow << it->second << termcolor::reset << "|  ";
-                                    }
-                                    else
-                                    {
-                                        std::cout << std::setw(columnWidths[i] + 2) << std::left << " " << "|  ";
-                                    }
-                                }
+                                // Count the rows
+                                std::cout << termcolor::green << "[COUNT] " << termcolor::reset << visibleRows.size() << std::endl;
                                 std::cout << std::endl;
                             }
 
-                            // Print separator
-                            for (size_t i = 0; i < columnWidths.size(); ++i)
+                            if (visibleRows.size() > 0)
                             {
-                                std::cout << std::setw(columnWidths[i] + 2) << std::setfill('_') << "_" << std::setfill(' ') << "|__";
+
+                                // Print separator
+                                for (size_t i = 0; i < columnWidths.size(); ++i)
+                                {
+                                    std::cout << std::setw(columnWidths[i] + 2) << std::setfill('_') << "_" << std::setfill(' ') << "|__";
+                                }
+                                std::cout << std::endl;
+
+                                // Print header
+                                for (size_t i = 0; i < columnNames.size(); ++i)
+                                {
+                                    std::cout << std::setw(columnWidths[i] + 2) << std::left << termcolor::blue << columnNames[i] << termcolor::reset << "|  ";
+                                }
+                                std::cout << std::endl;
+
+                                // Print separator
+                                for (size_t i = 0; i < columnWidths.size(); ++i)
+                                {
+                                    std::cout << std::setw(columnWidths[i] + 2) << std::setfill('_') << "_" << std::setfill(' ') << "|__";
+                                }
+                                std::cout << std::endl;
+
+                                // Print rows
+                                for (const auto &row : rows)
+                                {
+                                    for (size_t i = 0; i < columnNames.size(); ++i)
+                                    {
+                                        auto it = row.find(columnNames[i]);
+                                        if (it != row.end())
+                                        {
+                                            std::cout << std::setw(columnWidths[i] + 2) << std::left << termcolor::yellow << it->second << termcolor::reset << "|  ";
+                                        }
+                                        else
+                                        {
+                                            std::cout << std::setw(columnWidths[i] + 2) << std::left << " " << "|  ";
+                                        }
+                                    }
+                                    std::cout << std::endl;
+                                }
+
+                                // Print separator
+                                for (size_t i = 0; i < columnWidths.size(); ++i)
+                                {
+                                    std::cout << std::setw(columnWidths[i] + 2) << std::setfill('_') << "_" << std::setfill(' ') << "|__";
+                                }
                             }
                             std::cout << std::endl;
                         }
@@ -435,6 +468,12 @@ void Console::start()
                             // Alert if no rows found
                             std::cout << termcolor::yellow << "[WARN] " << termcolor::reset << "No rows found." << std::endl;
                         }
+                    }
+                    else if (strcmp("clear", toLowerCase(token).c_str()) == 0)
+                    {
+                        // Clear the console
+                        system(CLEAR);
+                        std::cout << termcolor::green << "[SUCCESS] " << termcolor::reset << "Console cleared." << std::endl;
                     }
                     else if (strcmp("DELETE", token.c_str()) == 0)
                     {

@@ -29,6 +29,14 @@ std::string Tokenizer::nextToken()
         return token;
     }
 
+    if (strcmp(str.c_str(), "COUNT") == 0)
+    {
+        size_t end = str.find_first_of(" ", start + 1);
+        std::string token = str.substr(start, end - start);
+        pos = end + 1;
+        return token;
+    }
+
     // Check for parentheses
     if (str[start] == '(')
     {
