@@ -70,3 +70,4 @@ The only supported function as of now, is `COUNT`.
 
 - [FujiwaraChoki](https://github.com/FujiwaraChoki)
 - [4g-13Eh](https://github.com/4g-13Eh)
+- [FischerNils06](https://github.com/FischerNils06)
