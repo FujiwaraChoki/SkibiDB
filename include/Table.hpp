@@ -57,6 +57,15 @@ public:
     std::vector<std::map<std::string, std::string>> select(const std::vector<std::string> &columns) const;
     std::vector<std::map<std::string, std::string>> select(const std::vector<std::string> &columns, const std::vector<std::string> &conditionTokens) const;
 
+    void setPK(const std::string &name);
+    void addFK(const std::string &name, const std::string &refTable, const std::string &refColumn);
+
+    std::string getPK() const;
+    std::vector<std::string> getFKs() const;
+
+    bool hasPK() const;
+    bool hasFK(const std::string &name) const;
+
     bool deleteRow(const std::vector<std::string> &conditionTokens);
 
 private:
@@ -64,4 +73,7 @@ private:
     std::string name;
     std::vector<Attribute> attributes;
     std::vector<std::map<std::string, std::string>> data;
+
+    std::string pk;
+    std::map<std::string, std::pair<std::string, std::string>> fks;
 };

@@ -239,6 +239,15 @@ void Console::start()
                                         value = "int:" + value;
                                     }
                                 }
+                                // Check if primary key
+                                else if (value == "PRIMARY_KEY")
+                                {
+                                    value = "pk:" + value;
+                                }
+                                else if (value == "FOREIGN_KEY")
+                                {
+                                    value = "fk:" + value;
+                                }
 
                                 // Remove double quotes
                                 value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
@@ -638,6 +647,84 @@ void Console::start()
                             else
                             {
                                 std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Invalid action." << std::endl;
+                            }
+                        }
+                        else if (strcmp("SET", token.c_str()) == 0)
+                        {
+                            if (strcmp("PK", tokens[i + 1].c_str()) == 0)
+                            {
+                                std::cout << "Setting primary key" << std::endl;
+                                std::string tableName = tokens[i + 2];
+                                std::string columnName = tokens[i + 3];
+
+                                if (tableName.empty())
+                                {
+                                    std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Table name is empty." << std::endl;
+                                    exit(1);
+                                }
+
+                                if (columnName.empty())
+                                {
+                                    std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Column name is empty." << std::endl;
+                                    exit(1);
+                                }
+                                std::cout << tableName << std::endl;
+
+                                // Get the table
+                                Table &table = this->skibiDB->getTable(tableName);
+
+                                std::cout << columnName << std::endl;
+
+                                // Set the primary key
+                                table.setPK(columnName);
+
+                                std::cout << termcolor::magenta << "[NOTE] " << termcolor::reset;
+                                std::cout << termcolor::italic << "It is recommended to save the database after setting a primary key." << termcolor::reset << std::endl;
+
+                                // xmpl: SET PK table_name column_name
+                            }
+                            else if (strcmp("FK", tokens[i + 1].c_str()) == 0)
+                            {
+                                // Add Foreign key using .addFK
+                                std::string tableName = tokens[i + 3];
+                                std::string columnName = tokens[i + 5];
+                                std::string refTable = tokens[i + 7];
+                                std::string refColumn = tokens[i + 9];
+
+                                if (tableName.empty())
+                                {
+                                    std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Table name is empty." << std::endl;
+                                    exit(1);
+                                }
+
+                                if (columnName.empty())
+                                {
+                                    std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Column name is empty." << std::endl;
+                                    exit(1);
+                                }
+
+                                if (refTable.empty())
+                                {
+                                    std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Referenced table name is empty." << std::endl;
+                                    exit(1);
+                                }
+
+                                if (refColumn.empty())
+                                {
+                                    std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Referenced column name is empty." << std::endl;
+                                    exit(1);
+                                }
+
+                                // Get the table
+                                Table &table = this->skibiDB->getTable(tableName);
+
+                                // Add the foreign key
+                                table.addFK(columnName, refTable, refColumn);
+
+                                std::cout << termcolor::magenta << "[NOTE] " << termcolor::reset;
+                                std::cout << termcolor::italic << "It is recommended to save the database after adding a foreign key." << termcolor::reset << std::endl;
+
+                                // xmpl: SET FK table_name column_name ref_table ref_column
                             }
                         }
                         else if (strcmp("DROP", token.c_str()) == 0)

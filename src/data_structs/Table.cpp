@@ -15,6 +15,8 @@ Table::Table(const std::string &name, const std::vector<Attribute> &attributes)
     this->name = name;
     this->attributes = attributes;
     this->numRows = 0;
+    this->pk = "__id__";
+    this->fks = std::map<std::string, std::pair<std::string, std::string>>();
 }
 
 Table::Table(const std::string &name, const std::vector<Attribute> &attributes, const std::vector<std::map<std::string, std::string>> &data)
@@ -23,6 +25,8 @@ Table::Table(const std::string &name, const std::vector<Attribute> &attributes, 
     this->attributes = attributes;
     this->numRows = data.size() > 0 ? data.size() : 0;
     this->data = data;
+    this->pk = "__id__";
+    this->fks = std::map<std::string, std::pair<std::string, std::string>>();
 }
 
 std::string Table::getTableName() const
@@ -259,6 +263,8 @@ std::string Table::toString() const
     j["attributes"] = nlohmann::json::array();
     j["numRows"] = numRows;
     j["data"] = nlohmann::json::array();
+    j["pk"] = pk;
+    j["fks"] = nlohmann::json::array();
     for (const auto &attribute : attributes)
     {
         nlohmann::json attr;
@@ -612,5 +618,57 @@ bool Table::deleteRow(const std::vector<std::string> &conditionTokens)
         }
     }
 
+    return false;
+}
+
+void Table::setPK(const std::string &name)
+{
+    // Set the primary key of the table
+    this->pk = name;
+}
+
+void Table::addFK(const std::string &name, const std::string &refTable, const std::string &refColumn)
+{
+    // Add a foreign key to the table
+    // Format: FK_name_refTable_refColumn
+    std::string fk = "FK_" + name + "_" + refTable + "_" + refColumn;
+    Attribute attr;
+    attr.setAttributeName(fk);
+    attr.setAttributeType("FOREIGN_KEY");
+    addAttribute(attr);
+}
+
+std::string Table::getPK() const
+{
+    return pk;
+}
+
+std::vector<std::string> Table::getFKs() const
+{
+    std::vector<std::string> fks;
+    for (const auto &attribute : attributes)
+    {
+        if (attribute.getAttributeType() == "FOREIGN KEY")
+        {
+            fks.push_back(attribute.getAttributeName());
+        }
+    }
+    return fks;
+}
+
+bool Table::hasPK() const
+{
+    return !pk.empty();
+}
+
+bool Table::hasFK(const std::string &name) const
+{
+    for (const auto &attribute : attributes)
+    {
+        if (attribute.getAttributeName() == name && attribute.getAttributeType() == "FOREIGN KEY")
+        {
+            return true;
+        }
+    }
     return false;
 }
