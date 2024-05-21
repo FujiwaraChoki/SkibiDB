@@ -58,6 +58,12 @@ This commands deletes every user, who's username sounds like "Fujiwarashoki".
 
 There's also the basic `DROP`, `UPDATE` and `EXIT` commands.
 
+## Set a Primary Key
+
+`SET PK users user_id`
+
+`SAVE`
+
 # Functions
 
 The only supported function as of now, is `COUNT`.
