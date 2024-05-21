@@ -761,7 +761,7 @@ namespace termcolor
             else if (&stream == &std::cerr || &stream == &std::clog)
                 return stderr;
 
-            return nullptr;
+            return NULL;
         }
 
         //! Since C++ hasn't a true way to extract stream handler
@@ -774,7 +774,7 @@ namespace termcolor
             else if (&stream == &std::wcerr || &stream == &std::wclog)
                 return stderr;
 
-            return nullptr;
+            return NULL;
         }
 
         // Say whether a given stream should be colorized or not. It's always
@@ -818,7 +818,7 @@ namespace termcolor
                 return GetStdHandle(STD_OUTPUT_HANDLE);
             else if (&stream == &std::cerr || &stream == &std::clog)
                 return GetStdHandle(STD_ERROR_HANDLE);
-            return nullptr;
+            return NULL;
         }
 
         //! same hack as used in get_standard_stream function, but for Windows with `std::wostream`
@@ -828,7 +828,7 @@ namespace termcolor
                 return GetStdHandle(STD_OUTPUT_HANDLE);
             else if (&stream == &std::wcerr || &stream == &std::wclog)
                 return GetStdHandle(STD_ERROR_HANDLE);
-            return nullptr;
+            return NULL;
         }
 
         //! Change Windows Terminal colors attribute. If some
