@@ -68,12 +68,33 @@ void Table::removeAttribute(const std::string &name)
 
 void Table::dropColumn(const std::string &name)
 {
+    // Remove the column from the list of attributes
     for (auto it = attributes.begin(); it != attributes.end(); ++it)
     {
         if (it->getAttributeName() == name)
         {
             attributes.erase(it);
-            return;
+            break;
+        }
+    }
+
+    // Remove the column from each row
+    for (auto &row : data)
+    {
+        row.erase(name);
+    }
+    // Remove the column from the primary key
+    if (pk == name)
+    {
+        pk = "";
+    }
+    // Remove the column from the foreign keys
+    for (auto it = fks.begin(); it != fks.end(); ++it)
+    {
+        if (it->first == name)
+        {
+            fks.erase(it);
+            break;
         }
     }
 }

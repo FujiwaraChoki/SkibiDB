@@ -574,12 +574,7 @@ void Console::start()
                             // Alter table
                             std::string tableName = tokens[i + 2];
                             std::string action = tokens[i + 3];
-
-                            if (tableName.empty())
-                            {
-                                std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Table name is empty." << std::endl;
-                                exit(1);
-                            }
+                            std::cout << tableName << std::endl;
 
                             if (action.empty())
                             {
@@ -589,12 +584,11 @@ void Console::start()
 
                             // Get the table
                             Table &table = this->skibiDB->getTable(tableName);
+                            // Add column
+                            std::string column = tokens[i + 4];
 
                             if (strcmp("ADD", action.c_str()) == 0)
                             {
-                                // Add column
-                                std::string column = tokens[i + 4];
-
                                 // Get column name and type (embedded in parentheses)
                                 std::string columnWithout = column.substr(column.find("(") + 1, column.find(")") - column.find("(") - 1);
 
@@ -629,17 +623,14 @@ void Console::start()
                             }
                             else if (strcmp("DROP", action.c_str()) == 0)
                             {
-                                // Drop column
-                                std::string columnName = tokens[i + 4];
-
-                                if (columnName.empty())
+                                if (column.empty())
                                 {
                                     std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Column name is empty." << std::endl;
                                     exit(1);
                                 }
 
                                 // Drop the column
-                                table.dropColumn(columnName);
+                                table.dropColumn(column);
 
                                 std::cout << termcolor::magenta << "[NOTE] " << termcolor::reset;
                                 std::cout << termcolor::italic << "It is recommended to save the database after dropping a column." << termcolor::reset << std::endl;
@@ -672,8 +663,6 @@ void Console::start()
 
                                 // Get the table
                                 Table &table = this->skibiDB->getTable(tableName);
-
-                                std::cout << columnName << std::endl;
 
                                 // Set the primary key
                                 table.setPK(columnName);
@@ -729,20 +718,25 @@ void Console::start()
                         }
                         else if (strcmp("DROP", token.c_str()) == 0)
                         {
-                            // Remove table
-                            std::string tableName = tokens[i + 2];
-
-                            if (tableName.empty())
+                            // Make sure it's not part of a bigger command
+                            if (strcmp("TABLE", tokens[i + 1].c_str()) == 0)
                             {
-                                std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Table name is empty." << std::endl;
-                                exit(1);
+                                // Remove table
+                                std::string tableName = tokens[i + 2];
+
+                                if (tableName.empty())
+                                {
+                                    std::cerr << termcolor::red << "[ERROR] " << termcolor::reset << "Table name is empty." << std::endl;
+                                    exit(1);
+                                }
+
+                                // Delete table
+                                this->skibiDB->removeTable(tableName);
+
+                                std::cout << termcolor::magenta << "[NOTE] " << termcolor::reset;
+                                std::cout << termcolor::italic << "It is recommended to save the database after deleting a table." << termcolor::reset << std::endl;
                             }
-
-                            // Delete table
-                            this->skibiDB->removeTable(tableName);
-
-                            std::cout << termcolor::magenta << "[NOTE] " << termcolor::reset;
-                            std::cout << termcolor::italic << "It is recommended to save the database after deleting a table." << termcolor::reset << std::endl;
+                            continue;
                         }
                     }
                 }
